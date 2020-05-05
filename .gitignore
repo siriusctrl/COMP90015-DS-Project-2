@@ -1,0 +1,10 @@
+
+*.class
+
+src/assets/.DS_Store
+
+.DS_Store
+
+out/production/COMP90015-DS-Project-2/META-INF/
+
+out/
