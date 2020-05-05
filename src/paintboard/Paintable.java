@@ -8,8 +8,6 @@ public abstract class Paintable implements Serializable {
     public int R, G, B;
     public float stroke;
     public int type;
-    String s1;
-    String s2;
 
     abstract void draw(Graphics2D g2d);
 
