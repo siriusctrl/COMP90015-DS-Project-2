@@ -16,11 +16,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class PaintBoardFrame extends JFrame {
-    private JButton[] choices;
-    private Icon items[];
+    private JButton[] tools;
 
     private final String[] actions = {
-            "new", "open", "save", "pencil", "line", "hRect", "fRect", "hOval", "fOval", "hCircle",
+            "new", "open", "saveAs", "pencil", "line", "hRect", "fRect", "hOval", "fOval", "hCircle",
             "fCircle", "hrRect", "frRect", "eraser", "palette", "stroke", "text"};
 
     private final String[] tipText = {
@@ -45,16 +44,16 @@ public class PaintBoardFrame extends JFrame {
 
     private Color color = Color.black;
     private JLabel statusBar;
-    public DrawPanel drawingArea;
+    public DrawPanel paintingPanel;
     private ObjectInputStream input;
     private ObjectOutputStream output;
     private final int width = 1000, height = 800;
-    private volatile int currentChoice = 3;
+    private volatile int currentTool = 3;
     private float stroke = 1.0f;
     int R, G, B;
     int genre1, genre2;
     int index = 0;
-    JToolBar buttonPanel;
+    JToolBar toolsPanel;
     Paintable[] components = new Paintable[5000];
 
     volatile Paintable newOb = null;
@@ -62,6 +61,8 @@ public class PaintBoardFrame extends JFrame {
     public PaintBoardFrame() {
         super("Online PaintBoard");
         JMenuBar bar = new JMenuBar();
+
+        // add file menu bar
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
         JMenuItem newItem = new JMenuItem("New");
@@ -86,6 +87,8 @@ public class PaintBoardFrame extends JFrame {
                 e -> System.exit(0));
         fileMenu.add(exitItem);
         bar.add(fileMenu);
+
+        // set color
         JMenu colorMenu = new JMenu("Color");
         colorMenu.setMnemonic('C');
         JMenuItem colorItem = new JMenuItem("Choose Color");
@@ -93,6 +96,7 @@ public class PaintBoardFrame extends JFrame {
         colorItem.addActionListener(
                 e -> chooseColor());
 
+        // set stroke
         colorMenu.add(colorItem);
         bar.add(colorMenu);
         JMenu strokeMenu = new JMenu("Stroke");
@@ -100,60 +104,43 @@ public class PaintBoardFrame extends JFrame {
         JMenuItem strokeItem = new JMenuItem("Set Stroke");
         strokeItem.setMnemonic('K');
         strokeItem.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        setStroke();
-                    }
-                });
+                e -> setStroke());
         strokeMenu.add(strokeItem);
         bar.add(strokeMenu);
 
-        JMenu helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic('H');
-
-        JMenuItem aboutItem = new JMenuItem("About this Whiteboard!");
-        aboutItem.addActionListener(
-                e -> JOptionPane.showMessageDialog(null,
-                        "Online Painting board that you can share your paint with others",
-                        "About",
-                        JOptionPane.INFORMATION_MESSAGE));
-
-        helpMenu.add(aboutItem);
-        bar.add(helpMenu);
-        items = new ImageIcon[actions.length];
-        drawingArea = new DrawPanel();
-        choices = new JButton[actions.length];
-        buttonPanel = new JToolBar(JToolBar.HORIZONTAL);
-
+        //set panels
+        paintingPanel = new DrawPanel();
+        tools = new JButton[actions.length];
+        toolsPanel = new JToolBar(JToolBar.HORIZONTAL);
+        
         ButtonHandlerx handlerx = new ButtonHandlerx();
         ButtonHandlery handlery = new ButtonHandlery();
 
-        for (int i = 0; i < choices.length; i++) {
-            items[i] = new ImageIcon("src/assets/"+ actions[i] + ".png");
-            choices[i] = new JButton("", items[i]);
-            choices[i].setToolTipText(tipText[i]);
-            buttonPanel.add(choices[i]);
+        for (int i = 0; i < tools.length; i++) {
+            tools[i] = new JButton(actions[i]);
+            tools[i].setToolTipText(tipText[i]);
+            toolsPanel.add(tools[i]);
         }
 
-        for (int i = 3; i < choices.length - 3; i++) {
-            choices[i].addActionListener(handlery);
+        for (int i = 3; i < tools.length - 3; i++) {
+            tools[i].addActionListener(handlery);
         }
 
         for (int i = 1; i < 4; i++) {
-            choices[choices.length - i].addActionListener(handlerx);
+            tools[tools.length - i].addActionListener(handlerx);
         }
 
-        choices[0].addActionListener(
+        tools[0].addActionListener(
                 e -> newFile());
-        choices[1].addActionListener(
+        tools[1].addActionListener(
                 e -> loadFile());
-        choices[2].addActionListener(
+        tools[2].addActionListener(
                 e -> saveFile());
 
         Container cont = getContentPane();
         super.setJMenuBar(bar);
-        cont.add(buttonPanel, BorderLayout.NORTH);
-        cont.add(drawingArea, BorderLayout.CENTER);
+        cont.add(toolsPanel, BorderLayout.NORTH);
+        cont.add(paintingPanel, BorderLayout.CENTER);
         statusBar = new JLabel();
         cont.add(statusBar, BorderLayout.SOUTH);
 
@@ -164,9 +151,9 @@ public class PaintBoardFrame extends JFrame {
 
     public class ButtonHandlery implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            for (int j = 3; j < choices.length - 3; j++) {
-                if (e.getSource() == choices[j]) {
-                    currentChoice = j;
+            for (int j = 3; j < tools.length - 3; j++) {
+                if (e.getSource() == tools[j]) {
+                    currentTool = j;
                     createNewItem();
                     repaint();
                 }
@@ -176,14 +163,14 @@ public class PaintBoardFrame extends JFrame {
 
     public class ButtonHandlerx implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == choices[choices.length - 3]) {
+            if (e.getSource() == tools[tools.length - 3]) {
                 chooseColor();
             }
-            if (e.getSource() == choices[choices.length - 2]) {
+            if (e.getSource() == tools[tools.length - 2]) {
                 setStroke();
             }
-            if (e.getSource() == choices[choices.length - 1]) {
-                currentChoice = 14;
+            if (e.getSource() == tools[tools.length - 1]) {
+                currentTool = 14;
                 createNewItem();
                 repaint();
             }
@@ -196,13 +183,13 @@ public class PaintBoardFrame extends JFrame {
                     ", " + e.getY() + "]");
             components[index].x1 = components[index].x2 = e.getX();
             components[index].y1 = components[index].y2 = e.getY();
-            if (currentChoice == 3 || currentChoice == 13) {
+            if (currentTool == 3 || currentTool == 13) {
                 components[index].x1 = components[index].x2 = e.getX();
                 components[index].y1 = components[index].y2 = e.getY();
                 index++;
                 createNewItem();
             }
-            if (currentChoice == 14) {
+            if (currentTool == 14) {
                 components[index].x1 = e.getX();
                 components[index].y1 = e.getY();
                 String input;
@@ -214,13 +201,13 @@ public class PaintBoardFrame extends JFrame {
                 ((Text)components[index]).setFont("Avenir Next");
                 index++;
                 createNewItem();
-                drawingArea.repaint();
+                paintingPanel.repaint();
             }
         }
         public void mouseReleased(MouseEvent e) {
             statusBar.setText("     Mouse Released @:[" + e.getX() +
                     ", " + e.getY() + "]");
-            if (currentChoice == 3 || currentChoice == 13) {
+            if (currentTool == 3 || currentTool == 13) {
                 components[index].x1 = e.getX();
                 components[index].y1 = e.getY();
             }
@@ -252,7 +239,7 @@ public class PaintBoardFrame extends JFrame {
             statusBar.setText("     Mouse Dragged @:[" + e.getX() +
                     ", " + e.getY() + "]");
 
-            if (currentChoice == 3 || currentChoice == 13) {
+            if (currentTool == 3 || currentTool == 13) {
                 components[index - 1].x1 = components[index].x2 = components[index].x1 = e.getX();
                 components[index - 1].y1 = components[index].y2 = components[index].y1 = e.getY();
                 newOb = components[index];
@@ -329,13 +316,13 @@ public class PaintBoardFrame extends JFrame {
     }
 
     void createNewItem() {
-        if (currentChoice == 14)
+        if (currentTool == 14)
         {
-            drawingArea.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+            paintingPanel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
         } else {
-            drawingArea.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            paintingPanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         }
-        switch (currentChoice) {
+        switch (currentTool) {
 //            case 3:
 //                components[index] = new Pencil();
 //                break;
@@ -377,40 +364,12 @@ public class PaintBoardFrame extends JFrame {
                 break;
         }
 
-        components[index].type = currentChoice;
-        System.out.println("Set index: "+index+" choice as "+currentChoice);
+        components[index].type = currentTool;
+        System.out.println("Set index: "+ index +" choice as "+currentTool);
         components[index].R = R;
         components[index].G = G;
         components[index].B = B;
         components[index].stroke = stroke;
-    }
-
-
-    public void createNewItemInClient(Paintable infoOb) {
-
-        components[index].x1 = infoOb.x1;
-        components[index].y1 = infoOb.y1;
-        components[index].x2 = infoOb.x2;
-        components[index].y2 = infoOb.y2;
-        currentChoice = infoOb.type;
-        // ===== testing clause
-        if (index > 1){
-            if (currentChoice != components[index-1].type) {
-                System.out.println("index:"+index+" currentChoice "+currentChoice+" index-1~choice: "+components[index-1].type);
-
-            }
-        }
-        // ===== 
-        R = infoOb.R;
-        G = infoOb.G;
-        B = infoOb.B;
-        stroke = infoOb.stroke;
-        //System.out.println();
-        index ++;
-        repaint();
-        createNewItem();
-        //System.out.println(index+" "+components[index].x1+" "+components[index].y1+" "+components[index].x2+" "+components[index].y2);
-
     }
 
     public void chooseColor() {
@@ -444,6 +403,7 @@ public class PaintBoardFrame extends JFrame {
         }
         File fileName = fileChooser.getSelectedFile();
         fileName.canWrite();
+
         if (fileName == null || fileName.getName().equals("")) {
             JOptionPane.showMessageDialog(fileChooser, "Invalid File Name",
                     "Invalid File Name", JOptionPane.ERROR_MESSAGE);
@@ -508,7 +468,7 @@ public class PaintBoardFrame extends JFrame {
 
     public void newFile() {
         index = 0;
-        currentChoice = 3;
+        currentTool = 3;
         color = Color.black;
         stroke = 1.0f;
         createNewItem();
