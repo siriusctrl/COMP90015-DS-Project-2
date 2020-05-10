@@ -28,9 +28,6 @@ public class JoinWhiteBoard {
 
         // try to join the server's board
         handleJoin(client.join());
-
-        // todo: use another thread to suspend until Allow/Reject was called to exit/setVisible
-        handleAgree(client.waitUntilResponds());
     }
 
     public static void handleJoin(Feedback feedback) {

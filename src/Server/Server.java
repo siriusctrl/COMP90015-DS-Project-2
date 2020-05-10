@@ -50,13 +50,20 @@ public class Server {
 
         // todo : simply allow everything, remove these once GUI are set
         for (String uid:clientsManager.getAllWaiting()) {
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             try {
                 System.out.println("Allowing user: " + uid);
-//                clientsManager.allowJoin(uid);
-//                clientsManager.updateBoard(uid);
-                clientsManager.rejectJoin(uid);
+                clientsManager.allowJoin(uid);
+                clientsManager.updateBoard(uid);
+//                clientsManager.rejectJoin(uid);
             } catch (RemoteException e) {
-                System.err.println("Cannot join user: " + uid + " due to: " + e.getMessage());
+                System.err.println("Cannot join user: " + uid + ", due to: " + e.getMessage());
             }
         }
     }

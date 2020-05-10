@@ -49,7 +49,9 @@ public class ClientsManager {
 
         // todo : below are trying to mock the gui request by suspending, remove when gui is set
 
-        server.reloadWaitingList();
+        Thread gui = new Thread(() -> server.reloadWaitingList());
+        gui.start();
+
 
         return new Feedback(FeedbackState.SUCCEED, "Waiting for server approval");
     }

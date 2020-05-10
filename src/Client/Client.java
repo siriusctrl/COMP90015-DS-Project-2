@@ -5,11 +5,13 @@ import RMI.*;
 import com.beust.jcommander.Parameter;
 
 import java.io.IOException;
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 public class Client {
 
@@ -24,6 +26,7 @@ public class Client {
 
     private int selfPort;
     private Registry selfRegistry;
+    private RemoteBoard board;
 
     private Registry serverRegistry;
 
@@ -34,7 +37,8 @@ public class Client {
         try {
             this.selfPort = CreateRegistry.getRegistryPort();
             this.selfRegistry = LocateRegistry.createRegistry(selfPort);
-            selfRegistry.bind("board", new RemoteBoard(this));
+            board = new RemoteBoard(this);
+            selfRegistry.bind("board", board);
         } catch (IOException | AlreadyBoundException e) {
             e.printStackTrace();
             System.exit(1);
@@ -63,32 +67,22 @@ public class Client {
         }
     }
 
-    public synchronized Feedback waitUntilResponds() {
-        while (!responds) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                return new Feedback(FeedbackState.ERROR, "Waiting for responds suspension failed! "
-                        + e.getMessage());
-            }
-        }
+    public void invokeBoard() {
+        // todo : implement client board
+        System.out.println("Invoke client board view");
+    }
 
-        if (allowJoin) {
-            return new Feedback(FeedbackState.SUCCEED, "server allow you to join");
+    public void exit() {
+        try {
+            selfRegistry.unbind("board");
+            UnicastRemoteObject.unexportObject(board, true);
+            System.out.println("Exiting");
+        } catch (NotBoundException | RemoteException e) {
+            e.printStackTrace();
         }
-
-        return new Feedback(FeedbackState.FAILED, "server reject join request");
     }
 
     public boolean isHelp() {
         return help;
-    }
-
-    public void setAllowJoin(boolean allowJoin) {
-        this.allowJoin = allowJoin;
-    }
-
-    public void setResponds(boolean responds) {
-        this.responds = responds;
     }
 }

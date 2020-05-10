@@ -3,6 +3,7 @@ package RMI;
 import Client.Client;
 import Tools.Drawable;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;
@@ -17,14 +18,13 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
 
     @Override
     public void allowJoin() {
-        client.setResponds(true);
-        client.setAllowJoin(true);
+        client.invokeBoard();
     }
 
     @Override
     public void rejectJoin() {
-        client.setResponds(true);
-        client.setAllowJoin(false);
+        System.out.println("Join request reject by server");
+        client.exit();
     }
 
     @Override
