@@ -1,4 +1,4 @@
-package WhiteBoard;
+package Entry;
 
 public class CreateWhiteBoard {
     public static void main(String[] args) {

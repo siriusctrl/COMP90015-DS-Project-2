@@ -1,5 +1,6 @@
 package RMI;
 
+import Feedback.Feedback;
 import Server.ClientsManager;
 
 import java.rmi.NotBoundException;
@@ -15,7 +16,7 @@ public class RemoteJoin extends UnicastRemoteObject implements IRemoteJoin {
     }
 
     @Override
-    public boolean join(String userId, String host, int port) throws RemoteException, NotBoundException {
+    public Feedback join(String userId, String host, int port) throws RemoteException, NotBoundException {
         System.out.println("==== get a user ====");
         System.out.println("userid = " + userId + ", host = " + host + ", port = " + port);
         // clientsManager add clients

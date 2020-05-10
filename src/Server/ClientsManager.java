@@ -1,8 +1,7 @@
 package Server;
 
-import Client.Client;
+import Feedback.*;
 import RMI.IRemoteBoard;
-import RMI.RemoteBoard;
 import Tools.Drawable;
 import Tools.Line;
 
@@ -23,9 +22,9 @@ public class ClientsManager {
         clients = new HashMap<>();
     }
 
-    public boolean addUser(String userId, String ip, int port) throws RemoteException, NotBoundException {
+    public Feedback addUser(String userId, String ip, int port) throws RemoteException, NotBoundException {
         if(clients.containsKey(userId)) {
-            return false;
+            return new Feedback(FeedbackState.ERROR, "Duplicate userId, please try another one");
         }
 
         Registry clientRegistry = LocateRegistry.getRegistry(ip, port);
@@ -39,7 +38,8 @@ public class ClientsManager {
 
         // test end here
 
-        return true;
+        // todo : add to server waiting list
+        return new Feedback(FeedbackState.SUCCEED, "Waiting for server approval");
     }
 
     public void updateBoard(String userId) throws RemoteException {
