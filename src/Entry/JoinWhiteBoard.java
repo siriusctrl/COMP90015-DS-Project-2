@@ -27,8 +27,13 @@ public class JoinWhiteBoard {
         System.out.println("==== joining the server ====");
 
         // try to join the server's board
-        Feedback feedback = client.join();
+        handleJoin(client.join());
 
+        // todo: use another thread to suspend until Allow/Reject was called to exit/setVisible
+        handleAgree(client.waitUntilResponds());
+    }
+
+    public static void handleJoin(Feedback feedback) {
         switch (feedback.getState()) {
             case ERROR -> {
                 System.err.println(feedback.getMsg());
@@ -40,7 +45,24 @@ public class JoinWhiteBoard {
             }
             case SUCCEED -> System.out.println(feedback.getMsg());
         }
+    }
 
 
+    public static void handleAgree(Feedback feedback) {
+        switch (feedback.getState()) {
+            case ERROR -> {
+                System.err.println(feedback.getMsg());
+                System.exit(1);
+            }
+            case FAILED -> {
+                System.out.println(feedback.getMsg());
+                System.exit(1);
+            }
+            case SUCCEED -> {
+                System.out.println(feedback.getMsg());
+                // todo : now can set the client board view visible
+                System.out.println("setting the view ...");
+            }
+        }
     }
 }

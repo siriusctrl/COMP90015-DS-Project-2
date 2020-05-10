@@ -17,7 +17,7 @@ public class CreateRegistry {
     }
 
 
-    public static Registry getRegistry(int port) throws RemoteException {
+    public static Registry setRegistry(int port) throws RemoteException {
 
         return LocateRegistry.createRegistry(port);
     }

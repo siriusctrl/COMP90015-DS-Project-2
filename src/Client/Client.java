@@ -27,38 +27,14 @@ public class Client {
 
     private Registry serverRegistry;
 
-    public static void main(String[] args) {
-        try {
-            Registry serverRegistry = LocateRegistry.getRegistry("localhost", 3456);
-
-            IRemoteHello remoteHello = (IRemoteHello) serverRegistry.lookup("hello");
-            System.out.println("Said: Yes");
-            String echo = remoteHello.hello("Yes");
-            System.out.println("Received: " + echo);
-
-            // create client RMI for board updating
-            int selfPort = CreateRegistry.getRegistryPort();
-
-            Registry selfRegistry = LocateRegistry.createRegistry(selfPort);
-            System.out.println("RMI at " + selfPort);
-            selfRegistry.bind("board", new RemoteBoard());
-
-
-            // try to join the remote server
-            IRemoteJoin remoteJoin = (IRemoteJoin) serverRegistry.lookup("join");
-
-            remoteJoin.join("morry", "localhost", selfPort);
-
-        } catch (NotBoundException | IOException | AlreadyBoundException e) {
-            e.printStackTrace();
-        }
-    }
+    private boolean responds = false;
+    private boolean allowJoin = false;
 
     public Client() {
         try {
             this.selfPort = CreateRegistry.getRegistryPort();
             this.selfRegistry = LocateRegistry.createRegistry(selfPort);
-            selfRegistry.bind("board", new RemoteBoard());
+            selfRegistry.bind("board", new RemoteBoard(this));
         } catch (IOException | AlreadyBoundException e) {
             e.printStackTrace();
             System.exit(1);
@@ -69,8 +45,8 @@ public class Client {
         getServerRegistry();
 
         try {
-            IRemoteJoin remoteJoin = (IRemoteJoin) serverRegistry.lookup("join");
-            return remoteJoin.join(userId, serverIp, selfPort);
+            IRemoteRequest remoteJoin = (IRemoteRequest) serverRegistry.lookup("join");
+            return remoteJoin.joinRequest(userId, serverIp, selfPort);
         } catch (RemoteException | NotBoundException e) {
             return new Feedback(FeedbackState.ERROR, "Joining Error: " + e.getMessage());
         }
@@ -87,7 +63,32 @@ public class Client {
         }
     }
 
+    public synchronized Feedback waitUntilResponds() {
+        while (!responds) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                return new Feedback(FeedbackState.ERROR, "Waiting for responds suspension failed! "
+                        + e.getMessage());
+            }
+        }
+
+        if (allowJoin) {
+            return new Feedback(FeedbackState.SUCCEED, "server allow you to join");
+        }
+
+        return new Feedback(FeedbackState.FAILED, "server reject join request");
+    }
+
     public boolean isHelp() {
         return help;
+    }
+
+    public void setAllowJoin(boolean allowJoin) {
+        this.allowJoin = allowJoin;
+    }
+
+    public void setResponds(boolean responds) {
+        this.responds = responds;
     }
 }
