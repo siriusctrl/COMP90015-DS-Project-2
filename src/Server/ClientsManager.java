@@ -90,7 +90,6 @@ public class ClientsManager {
 
         // todo : below are only for testing, change it to real board history later
         Vector<Drawable> newBoard = new Vector<>();
-        newBoard.add(new Line());
 
         clientBoard.updateBoard(newBoard);
     }
