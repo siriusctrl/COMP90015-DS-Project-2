@@ -1,9 +1,12 @@
 package Server;
 
+import Board.ParticipantListPanel;
 import Feedback.*;
 import RMI.IRemoteBoard;
-import Tools.Drawable;
-import Tools.Line;
+import Tools.*;
+import Utils.UserType;
+
+import static Utils.Logger.*;
 
 import java.awt.*;
 import java.rmi.NotBoundException;
@@ -12,14 +15,16 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
 
-public class ClientsManager {
+public class ParticipantsManager {
 
     private Server server;
     // clientID:clientRMI
     private HashMap<String, IRemoteBoard> clients;
     private HashMap<String, IRemoteBoard> waitingList;
 
-    public ClientsManager(Server server) {
+    private ParticipantListPanel participantListPanel = new ParticipantListPanel(null, this);
+
+    public ParticipantsManager(Server server) {
         clients = new HashMap<>();
         waitingList = new HashMap<>();
         this.server = server;
@@ -48,6 +53,8 @@ public class ClientsManager {
             return new Feedback(FeedbackState.ERROR, e.getMessage());
         }
 
+        participantListPanel.updateList();
+
         // todo : below are trying to mock the gui request by suspending, remove when gui is set
 
         Thread gui = new Thread(() -> server.reloadWaitingList());
@@ -63,11 +70,18 @@ public class ClientsManager {
      * @param userId the client id
      * @throws RemoteException
      */
-    public void allowJoin(String userId) throws RemoteException {
-        IRemoteBoard clientBoard = waitingList.get(userId);
+    public void allowJoin(String userId) {
+
+        try {
+            IRemoteBoard clientBoard = waitingList.get(userId);
+            clientBoard.allowJoin();
+            clients.put(userId, clientBoard);
+        } catch (RemoteException e) {
+            logError("Unable to join remote user: " + userId + ", the user might quit already.");
+        }
+
         waitingList.remove(userId);
-        clientBoard.allowJoin();
-        clients.put(userId, clientBoard);
+        participantListPanel.updateList();
     }
 
     /**
@@ -75,10 +89,28 @@ public class ClientsManager {
      * @param userId the client id
      * @throws RemoteException
      */
-    public void rejectJoin(String userId) throws RemoteException {
-        IRemoteBoard clientBoard = waitingList.get(userId);
-        clientBoard.rejectJoin();
+    public void rejectJoin(String userId) {
+        try {
+            IRemoteBoard clientBoard = waitingList.get(userId);
+            clientBoard.rejectJoin();
+        } catch (RemoteException e) {
+            logError("Unable to reject remote user: " + userId + ", the user might quit already.");
+        }
+
         waitingList.remove(userId);
+        participantListPanel.updateList();
+    }
+
+    public void kick(String userId) {
+        try {
+            IRemoteBoard clientBoard = clients.get(userId);
+            clientBoard.kickOut();
+        } catch (RemoteException e) {
+            logError("Unable to kick remote user: " + userId + ", the user might quit already.");
+        }
+
+        clients.remove(userId);
+        participantListPanel.updateList();
     }
 
     /**
@@ -96,7 +128,25 @@ public class ClientsManager {
         clientBoard.updateBoard(newBoard);
     }
 
-    public Set<String> getAllWaiting() {
-        return waitingList.keySet();
+    public UserType getUserType(String uid) {
+        // todo : fix this
+        return UserType.HOST;
     }
+
+    public void setParticipantList(ParticipantListPanel panel) {
+        this.participantListPanel = panel;
+    }
+
+    public String getServerId() {
+        return server.getUid();
+    }
+
+    public boolean isHost() {
+        // todo: make this manager to both host and participants
+        return true;
+    }
+
+    public Set<String> getAllParticipants() { return clients.keySet(); }
+
+    public Set<String> getAllWaiting() { return waitingList.keySet(); }
 }

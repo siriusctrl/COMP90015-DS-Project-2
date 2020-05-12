@@ -14,11 +14,13 @@ public class Server {
 
     @Parameter(names={"-p", "--port"}, description = "server listening port")
     private int port = 3456;
+    @Parameter(names = {"--id", "-i"}, description = "The server ID")
+    private String uid = "Server";
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
 
     private Registry serverRegistry;
-    private ClientsManager clientsManager;
+    private ParticipantsManager participantsManager;
 
     public Server() {
     }
@@ -32,12 +34,12 @@ public class Server {
             System.exit(1);
         }
 
-        clientsManager = new ClientsManager(this);
+        participantsManager = new ParticipantsManager(this);
 
         try {
             // bind functions
             serverRegistry.bind("hello", new RemoteHello());
-            serverRegistry.bind("join", new RemoteRequest(clientsManager));
+            serverRegistry.bind("join", new RemoteRequest(participantsManager));
         } catch (RemoteException | AlreadyBoundException e) {
             System.err.println("bind function error at Server: " + e.getMessage());
             System.exit(1);
@@ -49,7 +51,7 @@ public class Server {
         System.out.println("Reloading waiting list");
 
         // todo : simply allow everything, remove these once GUI are set
-        for (String uid:clientsManager.getAllWaiting()) {
+        for (String uid: participantsManager.getAllWaiting()) {
 
             try {
                 Thread.sleep(2000);
@@ -59,13 +61,17 @@ public class Server {
 
             try {
                 System.out.println("Allowing user: " + uid);
-                clientsManager.allowJoin(uid);
-                clientsManager.updateBoard(uid);
-//                clientsManager.rejectJoin(uid);
+                participantsManager.allowJoin(uid);
+                participantsManager.updateBoard(uid);
+//                participantsManager.rejectJoin(uid);
             } catch (RemoteException e) {
                 System.err.println("Cannot join user: " + uid + ", due to: " + e.getMessage());
             }
         }
+    }
+
+    public String getUid() {
+        return uid;
     }
 
     public boolean isHelp() {
