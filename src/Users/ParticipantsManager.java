@@ -199,8 +199,12 @@ public class ParticipantsManager {
         this.participantListPanel = panel;
     }
 
-    public String getServerId() {
+    public String getHostId() {
         return hostId;
+    }
+
+    public String getCurrentUid() {
+        return currentUid;
     }
 
     public boolean isHost() {

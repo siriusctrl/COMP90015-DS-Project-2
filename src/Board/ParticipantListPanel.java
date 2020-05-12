@@ -34,7 +34,14 @@ public class ParticipantListPanel extends JPanel {
         log("updating list");
 
         Vector<String> list = new Vector<>();
-        list.add("[Host] " + participantsManager.getServerId());
+
+        if(participantsManager.isHost()) {
+            list.add("[Host/You] " + participantsManager.getHostId());
+        } else {
+            list.add("[Host] " + participantsManager.getHostId());
+            // always list you on the top-most
+            list.add("[Participant/You] " + participantsManager.getCurrentUid());
+        }
 
         for (String uid: participantsManager.getAllParticipantsID()) {
             list.add("[Participant] " + uid);
