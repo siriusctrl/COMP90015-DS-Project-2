@@ -24,7 +24,8 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     @Override
     public void rejectJoin() {
         System.out.println("Join request reject by server");
-        participant.exit();
+        Thread temp = new Thread(participant::exit);
+        temp.start();
     }
 
 
@@ -39,7 +40,8 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     @Override
     public void kickOut() {
         log("You are kicked by the host");
-        participant.exit();
+        Thread temp = new Thread(participant::exit);
+        temp.start();
     }
 
     @Override
@@ -47,7 +49,8 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
         // todo: better use visual effect
         log("Host closed its board!");
         participant.hostQ = true;
-        participant.exit();
+        Thread temp = new Thread(participant::exit);
+        temp.start();
     }
 
     @Override

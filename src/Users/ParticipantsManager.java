@@ -144,6 +144,7 @@ public class ParticipantsManager {
             clientBoard.HostQuit();
         } catch (RemoteException e) {
             logError("Unable to quit remote user: " + uid + ", the user might quit already.");
+            e.printStackTrace();
         }
     }
 
@@ -187,15 +188,10 @@ public class ParticipantsManager {
             quit(uid, allParticipants.get(uid));
         }
 
-        System.out.println(getAllParticipantsID().toString());
-        System.out.println(getAllWaitingID().toString());
-
         for (String uid:getAllWaitingID()) {
             quit(uid, waitingList.get(uid));
         }
 
-        System.out.println(getAllParticipantsID().toString());
-        System.out.println(getAllWaitingID().toString());
     }
 
     public void updateAllParticipantList() {
