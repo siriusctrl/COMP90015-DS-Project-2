@@ -10,4 +10,5 @@ import java.rmi.RemoteException;
 public interface IRemoteRequest extends Remote {
     Feedback joinRequest(String clientId, String host, int port) throws RemoteException, NotBoundException;
     void addDrawableRequests(Drawable drawable);
+    void leave(String userId);
 }

@@ -37,7 +37,7 @@ public class Server {
         try {
             // bind functions
             serverRegistry.bind("hello", new RemoteHello());
-            serverRegistry.bind("join", new RemoteRequest(clientsManager));
+            serverRegistry.bind("request", new RemoteRequest(clientsManager));
         } catch (RemoteException | AlreadyBoundException e) {
             System.err.println("bind function error at Server: " + e.getMessage());
             System.exit(1);

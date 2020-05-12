@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
+import static Utils.Logger.*;
 
 public class ClientsManager {
 
@@ -57,6 +58,12 @@ public class ClientsManager {
     }
 
 
+    public void removeUser(String userId) {
+        log("Removing User");
+        //todo : finish this when GUI set
+    }
+
+
     /**
      * Allow the user to join the whiteboard, this will only be invoked by GUI/server
      * @param userId the client id
@@ -92,6 +99,18 @@ public class ClientsManager {
         Vector<Drawable> newBoard = new Vector<>();
 
         clientBoard.updateBoard(newBoard);
+    }
+
+    public void shutDown() {
+        for ( String uid : waitingList.keySet()) {
+            IRemoteBoard clientBoard = waitingList.get(uid);
+            clientBoard.serverClosed();
+        }
+
+        for ( String uid : clients.keySet()) {
+            IRemoteBoard clientBoard = clients.get(uid);
+            clientBoard.serverClosed();
+        }
     }
 
     public Set<String> getAllWaiting() {

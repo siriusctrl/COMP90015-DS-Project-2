@@ -30,8 +30,7 @@ public class Client {
 
     private Registry serverRegistry;
 
-    private boolean responds = false;
-    private boolean allowJoin = false;
+    private IRemoteRequest remoteRequest;
 
     public Client() {
         try {
@@ -49,8 +48,8 @@ public class Client {
         getServerRegistry();
 
         try {
-            IRemoteRequest remoteJoin = (IRemoteRequest) serverRegistry.lookup("join");
-            return remoteJoin.joinRequest(userId, serverIp, selfPort);
+            remoteRequest = (IRemoteRequest) serverRegistry.lookup("join");
+            return remoteRequest.joinRequest(userId, serverIp, selfPort);
         } catch (RemoteException | NotBoundException e) {
             return new Feedback(FeedbackState.ERROR, "Joining Error: " + e.getMessage());
         }
@@ -70,6 +69,10 @@ public class Client {
     public void invokeBoard() {
         // todo : implement client board
         System.out.println("Invoke client board view");
+    }
+
+    public void leave() {
+        remoteRequest.leave(userId);
     }
 
     public void exit() {

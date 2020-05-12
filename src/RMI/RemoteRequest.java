@@ -29,5 +29,8 @@ public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest
         // todo : implement this so that the client can send addDrawable Request to server
     }
 
+    public void leave(String userId) {
+        clientsManager.removeUser(userId);
+    }
 
 }

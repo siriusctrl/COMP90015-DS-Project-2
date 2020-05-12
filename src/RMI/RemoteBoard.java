@@ -31,4 +31,8 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     public void updateBoard(Vector<Drawable> paints) {
         // todo : finish this when board is set
     }
+
+    public void serverClosed() {
+        client.exit();
+    }
 }
