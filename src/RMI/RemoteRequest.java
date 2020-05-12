@@ -16,7 +16,7 @@ public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest
     }
 
     @Override
-    public Feedback joinRequest(String userId, String host, int port) throws RemoteException, NotBoundException {
+    public Feedback joinRequest(String userId, String host, int port) {
         System.out.println("==== get a user ====");
         System.out.println("userid = " + userId + ", host = " + host + ", port = " + port);
         // clientsManager add clients
