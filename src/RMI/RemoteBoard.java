@@ -5,8 +5,8 @@ import Tools.Drawable;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Set;
 import java.util.Vector;
+import static Utils.Logger.*;
 
 public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
 
@@ -38,13 +38,19 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
 
     @Override
     public void kickOut() {
+        log("You are kicked by the host");
         participant.exit();
     }
 
     @Override
     public void HostQuit() {
         // todo: better use visual effect
-        System.out.println("Host quit");
+        log("Host closed its board!");
         participant.exit();
+    }
+
+    @Override
+    public void refreshParticipantList() {
+        participant.getParticipantsManager().updateList();
     }
 }

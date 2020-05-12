@@ -5,6 +5,7 @@ import Users.ParticipantsManager;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
 import java.util.Set;
 
 public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest {
@@ -24,7 +25,12 @@ public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest
     }
 
     @Override
-    public Set<String> getParticipantList() {
-        return participantsManager.getAllParticipantsID();
+    public HashSet<String> getParticipantList() {
+        return new HashSet<>(participantsManager.getAllParticipantsID());
+    }
+
+    @Override
+    public void removeUserRequest(String uid) {
+        participantsManager.removeUser(uid);
     }
 }

@@ -44,6 +44,9 @@ public class ParticipantListPanel extends JPanel {
         }
 
         for (String uid: participantsManager.getAllParticipantsID()) {
+            if (uid.equals(participantsManager.getCurrentUid())) {
+                continue;
+            }
             list.add("[Participant] " + uid);
         }
 
@@ -64,7 +67,8 @@ public class ParticipantListPanel extends JPanel {
         participants.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         participants.addListSelectionListener((e) -> {
-            if (!participants.getValueIsAdjusting()) {
+            // only server can perform these actions
+            if (!participants.getValueIsAdjusting() && participantsManager.isHost()) {
                 String select = participants.getSelectedValue();
 
                 if (select != null) {

@@ -12,4 +12,5 @@ public interface IRemoteBoard extends Remote {
     void updateBoard(Vector<Drawable> paints) throws RemoteException;
     void kickOut() throws RemoteException;
     void HostQuit() throws RemoteException;
+    void refreshParticipantList() throws RemoteException;
 }

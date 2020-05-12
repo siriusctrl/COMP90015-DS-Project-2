@@ -1,19 +1,18 @@
 package Users;
 
+import Board.BoardView;
 import Feedback.*;
 import RMI.*;
 import Utils.UserType;
 import com.beust.jcommander.Parameter;
 
 import java.io.IOException;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Set;
 
 public class Participant {
 
@@ -52,14 +51,15 @@ public class Participant {
         participantsManager = new ParticipantsManager(UserType.PARTICIPANT, userId);
     }
 
-
     public Feedback join() {
 
         getServerRegistry();
 
         try {
             remoteRequest = (IRemoteRequest) serverRegistry.lookup("request");
-            return remoteRequest.joinRequest(userId, serverIp, selfPort);
+            Feedback feedback = remoteRequest.joinRequest(userId, serverIp, selfPort);
+            Runtime.getRuntime().addShutdownHook(new Thread(this::removeSelf));
+            return feedback;
         } catch (RemoteException | NotBoundException e) {
             return new Feedback(FeedbackState.ERROR, "Joining Error: " + e.getMessage());
         }
@@ -77,10 +77,16 @@ public class Participant {
     }
 
     public void invokeBoard(String hostId) {
-        System.out.println("Invoke client board view");
+        System.out.println("Invoke your board view");
         participantsManager.setHostId(hostId);
         participantsManager.setHostReq(remoteRequest);
-        // todo : implement client board
+
+        Thread board = new Thread(() -> {
+            BoardView boardView = new BoardView(participantsManager);
+            boardView.getFrame().setVisible(true);
+        });
+
+        board.start();
     }
 
     public void exit() {
@@ -89,8 +95,23 @@ public class Participant {
             UnicastRemoteObject.unexportObject(board, true);
             System.out.println("Exiting");
         } catch (NotBoundException | RemoteException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
+
+        System.exit(0);
+    }
+
+    public void removeSelf() {
+        System.out.println("remove self from host list");
+        try {
+            remoteRequest.removeUserRequest(userId);
+        } catch (RemoteException e) {
+            System.err.println("Cannot remove my self, exit!");
+        }
+    }
+
+    public ParticipantsManager getParticipantsManager() {
+        return participantsManager;
     }
 
     public boolean isHelp() {

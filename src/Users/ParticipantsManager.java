@@ -147,6 +147,19 @@ public class ParticipantsManager {
         }
     }
 
+    public void removeUser(String uid) {
+        if (!allParticipants.containsKey(uid) && !waitingList.containsKey(uid)) {
+            return;
+        }
+
+        allParticipants.remove(uid);
+        waitingList.remove(uid);
+        // refresh host own list
+        participantListPanel.updateList();
+        // refresh all other participant's list
+        updateAllParticipantList();
+    }
+
     public void clearAll() {
         if (mode != UserType.HOST) {
             return;
@@ -161,6 +174,21 @@ public class ParticipantsManager {
 
         for (String uid:getAllWaitingID()) {
             quit(uid, waitingList.get(uid));
+        }
+    }
+
+    public void updateAllParticipantList() {
+        if (mode != UserType.HOST) {
+            return;
+        }
+
+        for (String uid:getAllParticipantsID()) {
+            try {
+                IRemoteBoard board = allParticipants.get(uid);
+                board.refreshParticipantList();
+            } catch (RemoteException e) {
+                logError("Cannot update user: " + uid + "'s list");
+            }
         }
     }
 
@@ -195,6 +223,10 @@ public class ParticipantsManager {
         return null;
     }
 
+    public void updateList() {
+        participantListPanel.updateList();
+    }
+
     public void setParticipantList(ParticipantListPanel panel) {
         this.participantListPanel = panel;
     }
@@ -227,7 +259,7 @@ public class ParticipantsManager {
         try {
             return hostReq.getParticipantList();
         } catch (RemoteException e) {
-            logError("Server Failed");
+            e.printStackTrace();
             System.exit(0);
         }
 
