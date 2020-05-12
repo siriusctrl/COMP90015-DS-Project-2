@@ -5,6 +5,7 @@ import Users.ParticipantsManager;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Set;
 
 public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest {
 
@@ -20,5 +21,10 @@ public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest
         System.out.println("userid = " + userId + ", host = " + host + ", port = " + port);
         // participantsManager add clients
         return participantsManager.addUserToWaitingList(userId, host, port);
+    }
+
+    @Override
+    public Set<String> getParticipantList() {
+        return participantsManager.getAllParticipantsID();
     }
 }

@@ -3,6 +3,7 @@ package Users;
 import Board.ParticipantListPanel;
 import Feedback.*;
 import RMI.IRemoteBoard;
+import RMI.IRemoteRequest;
 import Tools.*;
 import Utils.UserType;
 
@@ -17,17 +18,27 @@ import java.util.*;
 
 public class ParticipantsManager {
 
-    private Server server;
     // clientID:clientRMI
-    private HashMap<String, IRemoteBoard> clients;
+    private HashMap<String, IRemoteBoard> allParticipants;
     private HashMap<String, IRemoteBoard> waitingList;
 
-    private ParticipantListPanel participantListPanel = new ParticipantListPanel(null, this);
+    private UserType mode;
+    private String currentUid;
+    private String hostId;
 
-    public ParticipantsManager(Server server) {
-        clients = new HashMap<>();
+    private IRemoteRequest hostReq;
+
+    private ParticipantListPanel participantListPanel;
+
+    public ParticipantsManager(UserType mode, String uid) {
+        allParticipants = new HashMap<>();
         waitingList = new HashMap<>();
-        this.server = server;
+        this.mode = mode;
+        this.currentUid = uid;
+
+        if (mode == UserType.HOST) {
+            hostId = uid;
+        }
     }
 
     /**
@@ -41,7 +52,7 @@ public class ParticipantsManager {
     public Feedback addUserToWaitingList(String userId, String ip, int port) {
         IRemoteBoard clientBoard;
 
-        if(clients.containsKey(userId) || waitingList.containsKey(userId)) {
+        if(allParticipants.containsKey(userId) || waitingList.containsKey(userId)) {
             return new Feedback(FeedbackState.ERROR, "Duplicate userId, please try another one");
         }
 
@@ -54,11 +65,11 @@ public class ParticipantsManager {
         }
 
         participantListPanel.updateList();
-
-        // todo : below are trying to mock the gui request by suspending, remove when gui is set
-
-        Thread gui = new Thread(() -> server.reloadWaitingList());
-        gui.start();
+//
+//        // todo : below are trying to mock the gui request by suspending, remove when gui is set
+//
+//        Thread gui = new Thread(() -> server.reloadWaitingList());
+//        gui.start();
 
 
         return new Feedback(FeedbackState.SUCCEED, "Waiting for server approval");
@@ -71,11 +82,14 @@ public class ParticipantsManager {
      * @throws RemoteException
      */
     public void allowJoin(String userId) {
+        if (mode != UserType.HOST) {
+            return;
+        }
 
         try {
             IRemoteBoard clientBoard = waitingList.get(userId);
-            clientBoard.allowJoin();
-            clients.put(userId, clientBoard);
+            clientBoard.allowJoin(currentUid);
+            allParticipants.put(userId, clientBoard);
         } catch (RemoteException e) {
             logError("Unable to join remote user: " + userId + ", the user might quit already.");
         }
@@ -90,6 +104,10 @@ public class ParticipantsManager {
      * @throws RemoteException
      */
     public void rejectJoin(String userId) {
+        if (mode != UserType.HOST) {
+            return;
+        }
+
         try {
             IRemoteBoard clientBoard = waitingList.get(userId);
             clientBoard.rejectJoin();
@@ -102,24 +120,28 @@ public class ParticipantsManager {
     }
 
     public void kick(String userId) {
+        if (mode != UserType.HOST) {
+            return;
+        }
+
         try {
-            IRemoteBoard clientBoard = clients.get(userId);
+            IRemoteBoard clientBoard = allParticipants.get(userId);
             clientBoard.kickOut();
         } catch (RemoteException e) {
             logError("Unable to kick remote user: " + userId + ", the user might quit already.");
         }
 
-        clients.remove(userId);
+        allParticipants.remove(userId);
         participantListPanel.updateList();
     }
 
     /**
-     * update a specific user's board the changes to all the clients
+     * update a specific user's board the changes to all the allParticipants
      * @param userId
      * @throws RemoteException
      */
     public void updateBoard(String userId) throws RemoteException {
-        IRemoteBoard clientBoard = clients.get(userId);
+        IRemoteBoard clientBoard = allParticipants.get(userId);
 
         // todo : below are only for testing, change it to real board history later
         Vector<Drawable> newBoard = new Vector<>();
@@ -128,9 +150,20 @@ public class ParticipantsManager {
         clientBoard.updateBoard(newBoard);
     }
 
+
     public UserType getUserType(String uid) {
-        // todo : fix this
-        return UserType.HOST;
+        if (uid.equals(hostId)) {
+            return UserType.HOST;
+        } else if (waitingList.containsKey(uid)) {
+            return UserType.VISITOR;
+        } else if (allParticipants.containsKey(uid)) {
+            return UserType.PARTICIPANT;
+        } else {
+            logError("Unknown uid: " + uid);
+            System.exit(1);
+        }
+
+        return null;
     }
 
     public void setParticipantList(ParticipantListPanel panel) {
@@ -138,15 +171,46 @@ public class ParticipantsManager {
     }
 
     public String getServerId() {
-        return server.getUid();
+        return hostId;
     }
 
     public boolean isHost() {
-        // todo: make this manager to both host and participants
-        return true;
+        return currentUid.equals(hostId);
     }
 
-    public Set<String> getAllParticipants() { return clients.keySet(); }
+    public boolean isHost(String uid) {
+        return uid.equals(hostId);
+    }
 
-    public Set<String> getAllWaiting() { return waitingList.keySet(); }
+    public void setHostId(String hostId) {
+        this.hostId = hostId;
+    }
+
+    public Set<String> getAllParticipantsID() {
+        if(mode == UserType.HOST) {
+            return allParticipants.keySet();
+        }
+
+        try {
+            return hostReq.getParticipantList();
+        } catch (RemoteException e) {
+            logError("Server Failed");
+            System.exit(0);
+        }
+
+        return null;
+    }
+
+    public void setHostReq(IRemoteRequest hostReq) {
+        this.hostReq = hostReq;
+    }
+
+    public Set<String> getAllWaitingID() {
+        if (mode == UserType.HOST) {
+            return waitingList.keySet();
+        }
+
+        return new HashSet<>();
+    }
+
 }

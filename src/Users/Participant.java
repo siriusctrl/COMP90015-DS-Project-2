@@ -2,6 +2,7 @@ package Users;
 
 import Feedback.*;
 import RMI.*;
+import Utils.UserType;
 import com.beust.jcommander.Parameter;
 
 import java.io.IOException;
@@ -12,8 +13,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Set;
 
-public class Client {
+public class Participant {
 
     @Parameter(names = { "-u ", "--userid" }, description = "unique userId")
     private static String userId = "bob";
@@ -30,10 +32,12 @@ public class Client {
 
     private Registry serverRegistry;
 
-    private boolean responds = false;
-    private boolean allowJoin = false;
+    private IRemoteRequest remoteRequest;
 
-    public Client() {
+    private ParticipantsManager participantsManager;
+
+    public Participant() {
+        // setup own RMI for receiving message from the host
         try {
             this.selfPort = CreateRegistry.getRegistryPort();
             this.selfRegistry = LocateRegistry.createRegistry(selfPort);
@@ -43,14 +47,19 @@ public class Client {
             e.printStackTrace();
             System.exit(1);
         }
+
+        //setup a participants manager in user mode
+        participantsManager = new ParticipantsManager(UserType.PARTICIPANT, userId);
     }
 
+
     public Feedback join() {
+
         getServerRegistry();
 
         try {
-            IRemoteRequest remoteJoin = (IRemoteRequest) serverRegistry.lookup("join");
-            return remoteJoin.joinRequest(userId, serverIp, selfPort);
+            remoteRequest = (IRemoteRequest) serverRegistry.lookup("request");
+            return remoteRequest.joinRequest(userId, serverIp, selfPort);
         } catch (RemoteException | NotBoundException e) {
             return new Feedback(FeedbackState.ERROR, "Joining Error: " + e.getMessage());
         }
@@ -67,9 +76,11 @@ public class Client {
         }
     }
 
-    public void invokeBoard() {
-        // todo : implement client board
+    public void invokeBoard(String hostId) {
         System.out.println("Invoke client board view");
+        participantsManager.setHostId(hostId);
+        participantsManager.setHostReq(remoteRequest);
+        // todo : implement client board
     }
 
     public void exit() {

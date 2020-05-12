@@ -1,5 +1,7 @@
 package Board;
 
+import Users.ParticipantsManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -11,11 +13,43 @@ public class BoardView {
     private JFrame frame;
 
     public static final String TITLE = "Distributed Board";
-
     public static final String[] TOOLS = {"Line", "Circle", "Rectangle", "Text", "Eraser"};
+
+    private ParticipantsManager participantsManager;
 
     public BoardView() {
         initBoard();
+    }
+
+    public BoardView(ParticipantsManager participantsManager) {
+        this.participantsManager = participantsManager;
+        init();
+    }
+
+
+    public void init() {
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // When close the window, it should remove its information in the system.
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                // todo : implementing remove logic here for both server and participants
+            }
+        });
+
+        frame.setSize(1000, 700);
+        frame.setTitle(TITLE);
+        frame.setResizable(true);
+
+        frame.getContentPane().add(
+                new ParticipantListPanel(this.getFrame(), participantsManager),
+                BorderLayout.EAST
+        );
+
+        frame.setVisible(false);
     }
 
     private void initBoard() {
@@ -35,21 +69,6 @@ public class BoardView {
         frame.setTitle(TITLE);
         frame.setResizable(true);
 
-        JButton tempButton = new JButton("What?");
-
-        frame.add(tempButton);
-
-        tempButton.addActionListener((e) -> {
-            int result = JOptionPane.showConfirmDialog(frame, "Allow him in?",
-                    "Guest Management", JOptionPane.YES_NO_CANCEL_OPTION);
-
-            switch (result) {
-                case (0) -> System.out.println("yes");
-                case (1) -> System.out.println("no");
-                case (2) -> System.out.println("cancel");
-            }
-        });
-//
         JList<String> tempList = new JList<>();
         Vector<String> testData = new Vector<>();
         testData.add("[guest] cao");
@@ -82,10 +101,9 @@ public class BoardView {
         });
 
         JPanel sub = new JPanel(new BorderLayout(0, 0));
-        sub.setPreferredSize(new Dimension(200,200));
+        sub.setPreferredSize(new Dimension(300,200));
         sub.add(tempList);
         frame.getContentPane().add(sub, BorderLayout.EAST);
-        frame.getContentPane().add(tempButton, BorderLayout.CENTER);
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("A Menu");
@@ -103,8 +121,6 @@ public class BoardView {
 
         frame.setJMenuBar(menuBar);
 
-
-        // todo : add buttons
 
         // don't pop this window until needed
         frame.setVisible(false);

@@ -1,21 +1,21 @@
 package Entry;
 
-import Users.Client;
+import Users.Participant;
 import Feedback.Feedback;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 public class JoinWhiteBoard {
     public static void main(String[] args) {
-        Client client = new Client();
+        Participant participant = new Participant();
 
         // parse the arguments
         try {
-            JCommander commander = JCommander.newBuilder().addObject(client).build();
+            JCommander commander = JCommander.newBuilder().addObject(participant).build();
             commander.parse(args);
 
             // print help message and then exit
-            if (client.isHelp()) {
+            if (participant.isHelp()) {
                 commander.usage();
                 System.exit(0);
             }
@@ -27,7 +27,7 @@ public class JoinWhiteBoard {
         System.out.println("==== joining the server ====");
 
         // try to join the server's board
-        handleJoin(client.join());
+        handleJoin(participant.join());
     }
 
     public static void handleJoin(Feedback feedback) {
@@ -41,25 +41,6 @@ public class JoinWhiteBoard {
                 System.exit(1);
             }
             case SUCCEED -> System.out.println(feedback.getMsg());
-        }
-    }
-
-
-    public static void handleAgree(Feedback feedback) {
-        switch (feedback.getState()) {
-            case ERROR -> {
-                System.err.println(feedback.getMsg());
-                System.exit(1);
-            }
-            case FAILED -> {
-                System.out.println(feedback.getMsg());
-                System.exit(1);
-            }
-            case SUCCEED -> {
-                System.out.println(feedback.getMsg());
-                // todo : now can set the client board view visible
-                System.out.println("setting the view ...");
-            }
         }
     }
 }

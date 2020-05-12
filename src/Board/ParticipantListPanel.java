@@ -24,10 +24,10 @@ public class ParticipantListPanel extends JPanel {
         this.participantsManager = participantsManager;
         this.PARENT = PARENT;
 
-//        setLayout(new BorderLayout());
-//        initList();
-//        participantsManager.setParticipantList(this);
-//        updateList();
+        setLayout(new BorderLayout());
+        initList();
+        participantsManager.setParticipantList(this);
+        updateList();
     }
 
     public void updateList() {
@@ -36,12 +36,12 @@ public class ParticipantListPanel extends JPanel {
         Vector<String> list = new Vector<>();
         list.add("[Host] " + participantsManager.getServerId());
 
-        for (String uid: participantsManager.getAllParticipants()) {
+        for (String uid: participantsManager.getAllParticipantsID()) {
             list.add("[Participant] " + uid);
         }
 
         if(participantsManager.isHost()) {
-            for (String uid: participantsManager.getAllWaiting()) {
+            for (String uid: participantsManager.getAllWaitingID()) {
                 list.add("[Waiting] " + uid);
             }
         }
@@ -56,8 +56,6 @@ public class ParticipantListPanel extends JPanel {
         participants.setForeground(Color.black);
         participants.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JPanel subPanel = new JPanel();
-
         participants.addListSelectionListener((e) -> {
             if (!participants.getValueIsAdjusting()) {
                 String select = participants.getSelectedValue();
@@ -67,11 +65,12 @@ public class ParticipantListPanel extends JPanel {
                     String[] temp = participants.getSelectedValue().split("]");
 
                     if(temp[1] != null) {
-                        selectedUID = temp[1];
+                        selectedUID = temp[1].strip();
 
-                        if (participantsManager.getAllWaiting().contains(selectedUID)) {
+                        // handle selection event
+                        if (participantsManager.getAllWaitingID().contains(selectedUID)) {
                             int result = JOptionPane.showConfirmDialog(PARENT,
-                                    "Allow |" + temp[1].strip() + "| in?",
+                                    "Allow |" + selectedUID + "| in?",
                                     "Visitor Management",
                                     JOptionPane.YES_NO_CANCEL_OPTION);
 
@@ -89,9 +88,10 @@ public class ParticipantListPanel extends JPanel {
                                     log("Cancel");
                                 }
                             }
-                        } else {
+                        } else if (participantsManager.getAllParticipantsID().contains(selectedUID) &&
+                                !participantsManager.isHost(selectedUID)) {
                             int result = JOptionPane.showConfirmDialog(PARENT,
-                                    "Kick |" + temp[1].strip() + "| ?",
+                                    "Kick |" + selectedUID + "| ?",
                                     "Guest Management",
                                     JOptionPane.YES_NO_OPTION);
 
@@ -105,12 +105,17 @@ public class ParticipantListPanel extends JPanel {
                                     log("Not kicking");
                                 }
                             }
+                        } else {
+                            log("Host Selected");
                         }
+
+                        participants.clearSelection();
                     }
                 }
             }
         });
 
+        JPanel subPanel = new JPanel();
         subPanel.setLayout(new BorderLayout(0, 0));
 
         scrollPane.add(participants);

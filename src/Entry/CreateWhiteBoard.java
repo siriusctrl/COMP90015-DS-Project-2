@@ -1,22 +1,19 @@
 package Entry;
 
-import Users.Server;
+import Users.Host;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 public class CreateWhiteBoard {
     public static void main(String[] args) {
         System.out.println("Try to create white board");
-        // todo : set entry for server here
-
-        Server server = new Server();
-
+        Host host = new Host();
         try {
-            JCommander commander = JCommander.newBuilder().addObject(server).build();
+            JCommander commander = JCommander.newBuilder().addObject(host).build();
             commander.parse(args);
 
             // print help message and then exit
-            if (server.isHelp()) {
+            if (host.isHelp()) {
                 commander.usage();
                 System.exit(0);
             }
@@ -25,7 +22,7 @@ public class CreateWhiteBoard {
             System.exit(1);
         }
 
-        server.setup();
-
+        host.setup();
+        System.out.println("Board Set");
     }
 }
