@@ -1,4 +1,4 @@
-package Server;
+package Users;
 
 import Board.ParticipantListPanel;
 import Feedback.*;

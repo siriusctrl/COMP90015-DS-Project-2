@@ -1,7 +1,7 @@
 package RMI;
 
 import Feedback.Feedback;
-import Server.ParticipantsManager;
+import Users.ParticipantsManager;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

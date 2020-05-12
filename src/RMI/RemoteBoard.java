@@ -1,9 +1,8 @@
 package RMI;
 
-import Client.Client;
+import Users.Client;
 import Tools.Drawable;
 
-import javax.swing.plaf.TableHeaderUI;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;

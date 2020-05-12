@@ -1,6 +1,6 @@
 package Entry;
 
-import Server.Server;
+import Users.Server;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 

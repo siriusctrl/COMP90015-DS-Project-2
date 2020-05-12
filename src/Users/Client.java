@@ -1,4 +1,4 @@
-package Client;
+package Users;
 
 import Feedback.*;
 import RMI.*;

@@ -1,7 +1,6 @@
 package Board;
 
-import Server.ParticipantsManager;
-import Utils.UserType;
+import Users.ParticipantsManager;
 
 import static Utils.Logger.*;
 

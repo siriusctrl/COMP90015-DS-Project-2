@@ -1,4 +1,4 @@
-package Server;
+package Users;
 
 import RMI.CreateRegistry;
 import RMI.RemoteHello;
@@ -15,7 +15,7 @@ public class Server {
     @Parameter(names={"-p", "--port"}, description = "server listening port")
     private int port = 3456;
     @Parameter(names = {"--id", "-i"}, description = "The server ID")
-    private String uid = "Server";
+    private String uid = "Users";
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
 

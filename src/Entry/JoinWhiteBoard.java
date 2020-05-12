@@ -1,6 +1,6 @@
 package Entry;
 
-import Client.Client;
+import Users.Client;
 import Feedback.Feedback;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
