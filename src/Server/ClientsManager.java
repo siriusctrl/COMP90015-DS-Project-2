@@ -5,6 +5,7 @@ import RMI.IRemoteBoard;
 import Tools.Drawable;
 import Tools.Line;
 
+import java.awt.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -90,7 +91,7 @@ public class ClientsManager {
 
         // todo : below are only for testing, change it to real board history later
         Vector<Drawable> newBoard = new Vector<>();
-        newBoard.add(new Line());
+        newBoard.add(new Line(new Point(0, 0), new Point(0,1)));
 
         clientBoard.updateBoard(newBoard);
     }
