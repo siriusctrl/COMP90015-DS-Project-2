@@ -75,18 +75,12 @@ public class ParticipantListPanel extends JPanel {
                                     JOptionPane.YES_NO_CANCEL_OPTION);
 
                             switch (result) {
-                                case (0) -> {
-                                    // yes
-                                    participantsManager.allowJoin(selectedUID);
-                                }
-                                case (1) -> {
-                                    //No
-                                    participantsManager.rejectJoin(selectedUID);
-                                }
-                                case (2) -> {
-                                    //cancel
-                                    log("Cancel");
-                                }
+                                case (0) -> // yes
+                                        participantsManager.allowJoin(selectedUID);
+                                case (1) -> //No
+                                        participantsManager.rejectJoin(selectedUID);
+                                case (2) -> //cancel
+                                        log("Cancel");
                             }
                         } else if (participantsManager.getAllParticipantsID().contains(selectedUID) &&
                                 !participantsManager.isHost(selectedUID)) {
@@ -96,14 +90,10 @@ public class ParticipantListPanel extends JPanel {
                                     JOptionPane.YES_NO_OPTION);
 
                             switch (result) {
-                                case (0) -> {
-                                    // yes
-                                    participantsManager.kick(selectedUID);
-                                }
-                                case (1) -> {
-                                    //No
-                                    log("Not kicking");
-                                }
+                                case (0) -> // yes
+                                        participantsManager.kick(selectedUID);
+                                case (1) -> //No
+                                        log("Not kicking");
                             }
                         } else {
                             log("Host Selected");
