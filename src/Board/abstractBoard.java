@@ -1,4 +1,5 @@
 package Board;
 
-public class abstractBoard {
+public abstract class abstractBoard {
+
 }
