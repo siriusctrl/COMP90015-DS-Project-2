@@ -32,7 +32,7 @@ public class BoardView {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.setSize(1000, 700);
-        frame.setTitle(TITLE);
+        frame.setTitle(TITLE + ": " + participantsManager.getCurrentUid());
         frame.setResizable(true);
 
         frame.getContentPane().add(
@@ -43,6 +43,9 @@ public class BoardView {
         frame.setVisible(false);
     }
 
+    /**
+     * deprecated and only for testing
+     */
     private void initBoard() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

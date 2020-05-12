@@ -28,6 +28,8 @@ public class JoinWhiteBoard {
 
         // try to join the server's board
         handleJoin(participant.join());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(participant::removeSelf));
     }
 
     public static void handleJoin(Feedback feedback) {
@@ -40,7 +42,9 @@ public class JoinWhiteBoard {
                 System.out.println(feedback.getMsg());
                 System.exit(1);
             }
-            case SUCCEED -> System.out.println(feedback.getMsg());
+            case SUCCEED -> {
+                System.out.println(feedback.getMsg());
+            }
         }
     }
 }

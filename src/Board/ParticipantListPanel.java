@@ -39,6 +39,7 @@ public class ParticipantListPanel extends JPanel {
             list.add("[Host/You] " + participantsManager.getHostId());
         } else {
             list.add("[Host] " + participantsManager.getHostId());
+            System.out.println("My name is " + participantsManager.getCurrentUid());
             // always list you on the top-most
             list.add("[Participant/You] " + participantsManager.getCurrentUid());
         }

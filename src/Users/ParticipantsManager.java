@@ -64,7 +64,7 @@ public class ParticipantsManager {
             return new Feedback(FeedbackState.ERROR, e.getMessage());
         }
 
-        participantListPanel.updateList();
+        updateList();
 
         return new Feedback(FeedbackState.SUCCEED, "Waiting for server approval");
     }
@@ -89,7 +89,7 @@ public class ParticipantsManager {
         }
 
         waitingList.remove(userId);
-        participantListPanel.updateList();
+        updateAllParticipantList();
     }
 
     /**
@@ -130,7 +130,7 @@ public class ParticipantsManager {
         }
 
         allParticipants.remove(userId);
-        participantListPanel.updateList();
+        updateAllParticipantList();
     }
 
     public void quit(String uid, IRemoteBoard clientBoard) {
@@ -154,9 +154,6 @@ public class ParticipantsManager {
 
         allParticipants.remove(uid);
         waitingList.remove(uid);
-        // refresh host own list
-        participantListPanel.updateList();
-        // refresh all other participant's list
         updateAllParticipantList();
     }
 
@@ -181,6 +178,8 @@ public class ParticipantsManager {
         if (mode != UserType.HOST) {
             return;
         }
+
+        updateList();
 
         for (String uid:getAllParticipantsID()) {
             try {
@@ -224,7 +223,13 @@ public class ParticipantsManager {
     }
 
     public void updateList() {
-        participantListPanel.updateList();
+        if (participantListPanel != null) {
+            participantListPanel.updateList();
+        }
+    }
+
+    public void setCurrentUid(String currentUid) {
+        this.currentUid = currentUid;
     }
 
     public void setParticipantList(ParticipantListPanel panel) {

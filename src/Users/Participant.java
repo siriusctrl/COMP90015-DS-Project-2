@@ -16,7 +16,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Participant {
 
-    @Parameter(names = { "-u ", "--userid" }, description = "unique userId")
+    @Parameter(names = { "-u", "--userid" }, description = "unique userId")
     private static String userId = "bob";
     @Parameter(names = {"-a", "--address"}, description =  "server Ip address")
     private static String serverIp = "localhost";
@@ -47,18 +47,18 @@ public class Participant {
             System.exit(1);
         }
 
-        //setup a participants manager in user mode
-        participantsManager = new ParticipantsManager(UserType.PARTICIPANT, userId);
+
     }
 
     public Feedback join() {
+        //setup a participants manager in user mode
+        participantsManager = new ParticipantsManager(UserType.PARTICIPANT, userId);
 
         getServerRegistry();
 
         try {
             remoteRequest = (IRemoteRequest) serverRegistry.lookup("request");
             Feedback feedback = remoteRequest.joinRequest(userId, serverIp, selfPort);
-            Runtime.getRuntime().addShutdownHook(new Thread(this::removeSelf));
             return feedback;
         } catch (RemoteException | NotBoundException e) {
             return new Feedback(FeedbackState.ERROR, "Joining Error: " + e.getMessage());
