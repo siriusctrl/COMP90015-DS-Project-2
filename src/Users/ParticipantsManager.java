@@ -65,12 +65,6 @@ public class ParticipantsManager {
         }
 
         participantListPanel.updateList();
-//
-//        // todo : below are trying to mock the gui request by suspending, remove when gui is set
-//
-//        Thread gui = new Thread(() -> server.reloadWaitingList());
-//        gui.start();
-
 
         return new Feedback(FeedbackState.SUCCEED, "Waiting for server approval");
     }
@@ -108,6 +102,8 @@ public class ParticipantsManager {
             return;
         }
 
+        log("Rejecting User " + userId);
+
         try {
             IRemoteBoard clientBoard = waitingList.get(userId);
             clientBoard.rejectJoin();
@@ -124,6 +120,8 @@ public class ParticipantsManager {
             return;
         }
 
+        log("Kicking User " + userId);
+
         try {
             IRemoteBoard clientBoard = allParticipants.get(userId);
             clientBoard.kickOut();
@@ -133,6 +131,37 @@ public class ParticipantsManager {
 
         allParticipants.remove(userId);
         participantListPanel.updateList();
+    }
+
+    public void quit(String uid, IRemoteBoard clientBoard) {
+        if (mode != UserType.HOST) {
+            return;
+        }
+
+        log("Quiting User " + uid);
+
+        try {
+            clientBoard.HostQuit();
+        } catch (RemoteException e) {
+            logError("Unable to quit remote user: " + uid + ", the user might quit already.");
+        }
+    }
+
+    public void clearAll() {
+        if (mode != UserType.HOST) {
+            return;
+        }
+
+        for (String uid:getAllParticipantsID()) {
+            if (uid.equals(currentUid)) {
+                continue;
+            }
+            quit(uid, allParticipants.get(uid));
+        }
+
+        for (String uid:getAllWaitingID()) {
+            quit(uid, waitingList.get(uid));
+        }
     }
 
     /**

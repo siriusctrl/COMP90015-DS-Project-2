@@ -31,15 +31,6 @@ public class BoardView {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // When close the window, it should remove its information in the system.
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                // todo : implementing remove logic here for both server and participants
-            }
-        });
-
         frame.setSize(1000, 700);
         frame.setTitle(TITLE);
         frame.setResizable(true);
@@ -61,7 +52,6 @@ public class BoardView {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                // todo : implementing remove logic here for both server and participants
             }
         });
 

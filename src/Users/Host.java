@@ -53,6 +53,8 @@ public class Host {
         });
 
         guiThread.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(participantsManager::clearAll));
     }
 
     public boolean isHelp() {

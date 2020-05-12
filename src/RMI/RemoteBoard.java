@@ -37,7 +37,14 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     }
 
     @Override
-    public void kickOut() throws RemoteException {
+    public void kickOut() {
+        participant.exit();
+    }
+
+    @Override
+    public void HostQuit() {
+        // todo: better use visual effect
+        System.out.println("Host quit");
         participant.exit();
     }
 }
