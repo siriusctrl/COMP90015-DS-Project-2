@@ -46,6 +46,7 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     public void HostQuit() {
         // todo: better use visual effect
         log("Host closed its board!");
+        participant.hostQ = true;
         participant.exit();
     }
 

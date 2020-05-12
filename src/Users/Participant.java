@@ -35,6 +35,8 @@ public class Participant {
 
     private ParticipantsManager participantsManager;
 
+    public boolean hostQ = false;
+
     public Participant() {
         // setup own RMI for receiving message from the host
         try {
@@ -102,11 +104,14 @@ public class Participant {
     }
 
     public void removeSelf() {
-        System.out.println("remove self from host list");
-        try {
-            remoteRequest.removeUserRequest(userId);
-        } catch (RemoteException e) {
-            System.err.println("Cannot remove my self, exit!");
+
+        if (!hostQ) {
+            System.out.println("remove self from host list");
+            try {
+                remoteRequest.removeUserRequest(userId);
+            } catch (RemoteException e) {
+                System.err.println("Cannot remove my self, exit!");
+            }
         }
     }
 

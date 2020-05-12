@@ -29,6 +29,7 @@ public class JoinWhiteBoard {
         // try to join the server's board
         handleJoin(participant.join());
 
+        // add here to remove self from both waiting list and
         Runtime.getRuntime().addShutdownHook(new Thread(participant::removeSelf));
     }
 

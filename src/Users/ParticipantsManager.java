@@ -148,13 +148,27 @@ public class ParticipantsManager {
     }
 
     public void removeUser(String uid) {
-        if (!allParticipants.containsKey(uid) && !waitingList.containsKey(uid)) {
+        if (mode != UserType.HOST) {
             return;
         }
 
-        allParticipants.remove(uid);
-        waitingList.remove(uid);
-        updateAllParticipantList();
+        if (!allParticipants.containsKey(uid) && !waitingList.containsKey(uid)) {
+            return;
+        } else if (allParticipants.containsKey(uid) && waitingList.containsKey(uid)) {
+            allParticipants.remove(uid);
+            waitingList.remove(uid);
+            updateAllParticipantList();
+        } else if (allParticipants.containsKey(uid)) {
+            allParticipants.remove(uid);
+            updateAllParticipantList();
+        } else if (waitingList.containsKey(uid)) {
+            waitingList.remove(uid);
+            updateList();
+        } else {
+            logError("Unknown removed user: " + uid);
+        }
+
+
     }
 
     public void clearAll() {
@@ -162,16 +176,26 @@ public class ParticipantsManager {
             return;
         }
 
+        System.out.println(getAllParticipantsID().toString());
+        System.out.println(getAllWaitingID().toString());
+
         for (String uid:getAllParticipantsID()) {
             if (uid.equals(currentUid)) {
                 continue;
             }
+
             quit(uid, allParticipants.get(uid));
         }
+
+        System.out.println(getAllParticipantsID().toString());
+        System.out.println(getAllWaitingID().toString());
 
         for (String uid:getAllWaitingID()) {
             quit(uid, waitingList.get(uid));
         }
+
+        System.out.println(getAllParticipantsID().toString());
+        System.out.println(getAllWaitingID().toString());
     }
 
     public void updateAllParticipantList() {
@@ -226,10 +250,6 @@ public class ParticipantsManager {
         if (participantListPanel != null) {
             participantListPanel.updateList();
         }
-    }
-
-    public void setCurrentUid(String currentUid) {
-        this.currentUid = currentUid;
     }
 
     public void setParticipantList(ParticipantListPanel panel) {
