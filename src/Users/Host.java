@@ -1,6 +1,8 @@
 package Users;
 
 import Board.BoardView;
+import Board.DrawBoard;
+import Board.DrawBoardManager;
 import RMI.CreateRegistry;
 import RMI.RemoteHello;
 

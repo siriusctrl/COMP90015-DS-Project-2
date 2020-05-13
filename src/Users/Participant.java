@@ -1,6 +1,8 @@
 package Users;
 
 import Board.BoardView;
+import Board.DrawBoard;
+import Board.DrawBoardManager;
 import Feedback.*;
 import RMI.*;
 import Utils.UserType;

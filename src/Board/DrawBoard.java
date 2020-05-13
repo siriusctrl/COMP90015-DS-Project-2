@@ -52,6 +52,7 @@ public class DrawBoard extends JPanel {
 
     public void setBuffer(Drawable buffer) {
         this.buffer = buffer;
+        repaint();
     }
 
     public void clearBuffer() {

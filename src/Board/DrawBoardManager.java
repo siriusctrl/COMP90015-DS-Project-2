@@ -10,10 +10,8 @@ public class DrawBoardManager {
     private DrawBoard drawBoard;
     private ParticipantsManager participantsManager;
 
-    public DrawBoardManager(DrawBoard drawBoard, ParticipantsManager participantsManager) {
-        this.drawBoard = drawBoard;
+    public DrawBoardManager(ParticipantsManager participantsManager) {
         this.participantsManager = participantsManager;
-
     }
 
     // FIXME : this is only for testing in boardview initBoard
@@ -28,11 +26,21 @@ public class DrawBoardManager {
         return history;
     }
 
+    /**
+     * This will be called when new participant join the board
+     * @param history the full history so far for new participant
+     *                to quickly catching up
+     */
     public void setHistory(Vector<Drawable> history) {
         this.history = history;
-        // todo : look what is menu bar
-        // todo : implement update remote board
-        //participantsManager.updateOtherBoard(history);
         drawBoard.repaint();
     }
+
+    public void addDrawable(Drawable drawable) {
+        history.add(drawable);
+        // todo : let the participant handler handle different mode action
+        //participantsManager.addHistory()
+        drawBoard.repaint();
+    }
+
 }

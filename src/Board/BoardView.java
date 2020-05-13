@@ -1,5 +1,6 @@
 package Board;
 
+import Tools.Drawable;
 import Users.ParticipantsManager;
 
 import javax.swing.*;
@@ -17,6 +18,9 @@ public class BoardView {
     public static final String[] TOOLS = {"Pen", "Line", "Circle", "Rectangle", "Text", "Eraser", "None"};
 
     private ParticipantsManager participantsManager;
+    private DrawBoard drawArea;
+    private DrawBoardManager drawBoardManager;
+    private MouseHandler mouseHandler;
 
     public BoardView() {
         initBoard();
@@ -27,6 +31,9 @@ public class BoardView {
         init();
     }
 
+    public void addDrawable(Drawable d) {
+        drawBoardManager.addDrawable(d);
+    }
 
     public void init() {
         frame = new JFrame();
@@ -41,8 +48,15 @@ public class BoardView {
                 BorderLayout.EAST
         );
 
+        addMenu();
 
-        // set Tools
+        // Set Board
+        mouseHandler = new MouseHandler(this);
+        addDrawingArea();
+
+        // Set Board ends here
+
+        // Set Tools
         JPanel drawToolPanel = new JPanel();
 
         drawToolPanel.setPreferredSize(new Dimension(110, 0));
@@ -73,10 +87,47 @@ public class BoardView {
             bt.addActionListener((e) -> {
                 // todo : set real selected tool here
                 toolnow.setText(e.getActionCommand());
+                mouseHandler.setToolSelected(e.getActionCommand());
             });
         }
 
+        // Tools Setting end here
+
         frame.setVisible(false);
+    }
+
+    public void addDrawingArea() {
+        drawBoardManager = new DrawBoardManager(participantsManager);
+        drawArea = new DrawBoard(drawBoardManager);
+        drawBoardManager.setDrawBoard(drawArea);
+        drawArea.setBorder(new TitledBorder(null, "Drawing Area",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+        drawArea.addMouseListener(mouseHandler);
+        drawArea.addMouseMotionListener(mouseHandler);
+
+        drawBoardManager.setDrawBoard(drawArea);
+        // todo : remove this as the host will set your board
+        drawBoardManager.setHistory(new Vector<>());
+        drawArea.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+        frame.getContentPane().add(drawArea, BorderLayout.CENTER);
+    }
+
+    public void addMenu() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("A Menu");
+        menu.setMnemonic('A');
+        menu.getAccessibleContext().setAccessibleDescription(
+                "The only menu in this program that has menu items");
+        menuBar.add(menu);
+
+        JMenuItem menuItem = new JMenuItem("Pen", 'A');
+        menuItem.addActionListener(e -> {
+            System.out.println("cao");
+        });
+        menu.add(menuItem);
+
+        frame.setJMenuBar(menuBar);
     }
 
     /**
@@ -136,21 +187,7 @@ public class BoardView {
                 TitledBorder.LEADING, TitledBorder.TOP, null, null));
         frame.getContentPane().add(sub, BorderLayout.EAST);
 
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("A Menu");
-        menu.setMnemonic('A');
-        menu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
-        menuBar.add(menu);
-
-        JMenuItem menuItem = new JMenuItem("Pen", 'A');
-        menuItem.addActionListener(e -> {
-            System.out.println("cao");
-        });
-        menu.add(menuItem);
-
-
-        frame.setJMenuBar(menuBar);
+        addMenu();
 
         // ANCHOR: set drawing tools
 
@@ -203,5 +240,9 @@ public class BoardView {
 
     public JFrame getFrame() {
         return frame;
+    }
+
+    public DrawBoard getDrawArea() {
+        return drawArea;
     }
 }
