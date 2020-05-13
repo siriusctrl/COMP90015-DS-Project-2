@@ -49,7 +49,10 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
         // todo: better use visual effect
         log("Host closed its board!");
         participant.hostQ = true;
-        Thread temp = new Thread(participant::exit);
+        Thread temp = new Thread(() -> {
+            participant.quitCheck();
+            participant.exit();
+        });
         temp.start();
     }
 

@@ -8,6 +8,7 @@ import RMI.*;
 import Utils.UserType;
 import com.beust.jcommander.Parameter;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -32,10 +33,10 @@ public class Participant {
     private RemoteBoard board;
 
     private Registry serverRegistry;
-
     private IRemoteRequest remoteRequest;
-
     private ParticipantsManager participantsManager;
+
+    private BoardView boardView;
 
     public boolean hostQ = false;
 
@@ -86,7 +87,7 @@ public class Participant {
         participantsManager.setHostReq(remoteRequest);
 
         Thread board = new Thread(() -> {
-            BoardView boardView = new BoardView(participantsManager);
+            boardView = new BoardView(participantsManager);
             boardView.getFrame().setVisible(true);
         });
 
@@ -115,6 +116,10 @@ public class Participant {
                 System.err.println("Cannot remove my self, exit!");
             }
         }
+    }
+
+    public void quitCheck() {
+        JOptionPane.showMessageDialog(boardView.getFrame(), "Server quit!");
     }
 
     public ParticipantsManager getParticipantsManager() {
