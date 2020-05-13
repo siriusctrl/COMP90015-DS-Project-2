@@ -3,6 +3,7 @@ package Board;
 import Users.ParticipantsManager;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -13,7 +14,7 @@ public class BoardView {
     private JFrame frame;
 
     public static final String TITLE = "Distributed Board";
-    public static final String[] TOOLS = {"Line", "Circle", "Rectangle", "Text", "Eraser"};
+    public static final String[] TOOLS = {"Pen", "Line", "Circle", "Rectangle", "Text", "Eraser", "None"};
 
     private ParticipantsManager participantsManager;
 
@@ -39,6 +40,41 @@ public class BoardView {
                 new ParticipantListPanel(this.getFrame(), participantsManager),
                 BorderLayout.EAST
         );
+
+
+        // set Tools
+        JPanel drawToolPanel = new JPanel();
+
+        drawToolPanel.setPreferredSize(new Dimension(110, 0));
+        frame.getContentPane().add(drawToolPanel, BorderLayout.WEST);
+        drawToolPanel.setLayout(new BorderLayout(0 ,0));
+        JPanel toolPanel = new JPanel();
+
+        toolPanel.setBorder(new TitledBorder(null, "Tool Bar",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+        toolPanel.setLayout(new GridLayout(0, 1, 0, 0));
+        toolPanel.setPreferredSize(new Dimension(0, 300));
+        drawToolPanel.add(toolPanel, BorderLayout.NORTH);
+
+        JTextPane toolnow = new JTextPane();
+        toolnow.setText("Pen");
+        toolnow.setOpaque(false);
+        toolnow.setEditable(false);
+        JPanel displayTool = new JPanel();
+        displayTool.add(toolnow);
+        drawToolPanel.add(displayTool, BorderLayout.CENTER);
+
+        JButton bt = null;
+        for(String tool:TOOLS) {
+            bt = new JButton(tool);
+            bt.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            toolPanel.add(bt);
+            bt.addActionListener((e) -> {
+                // todo : set real selected tool here
+                toolnow.setText(e.getActionCommand());
+            });
+        }
 
         frame.setVisible(false);
     }
@@ -94,8 +130,10 @@ public class BoardView {
         });
 
         JPanel sub = new JPanel(new BorderLayout(0, 0));
-        sub.setPreferredSize(new Dimension(300,200));
+        sub.setPreferredSize(new Dimension(200,200));
         sub.add(tempList);
+        sub.setBorder(new TitledBorder(null, "Participants",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
         frame.getContentPane().add(sub, BorderLayout.EAST);
 
         JMenuBar menuBar = new JMenuBar();
@@ -114,6 +152,50 @@ public class BoardView {
 
         frame.setJMenuBar(menuBar);
 
+        // ANCHOR: set drawing tools
+
+        JPanel drawToolPanel = new JPanel();
+
+        drawToolPanel.setPreferredSize(new Dimension(110, 0));
+        frame.getContentPane().add(drawToolPanel, BorderLayout.WEST);
+        drawToolPanel.setLayout(new BorderLayout(0 ,0));
+        JPanel toolPanel = new JPanel();
+
+        toolPanel.setBorder(new TitledBorder(null, "Tool Bar",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+        toolPanel.setLayout(new GridLayout(0, 1, 0, 0));
+        toolPanel.setPreferredSize(new Dimension(0, 300));
+        drawToolPanel.add(toolPanel, BorderLayout.NORTH);
+
+        JTextPane toolnow = new JTextPane();
+        toolnow.setText("Pen");
+        JPanel displayTool = new JPanel();
+        displayTool.add(toolnow);
+        drawToolPanel.add(displayTool, BorderLayout.CENTER);
+
+        JButton bt = null;
+        for(String tool:TOOLS) {
+            bt = new JButton(tool);
+            bt.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            toolPanel.add(bt);
+            bt.addActionListener((e) -> {
+                // set the selected tool here
+                toolnow.setText(e.getActionCommand());
+            });
+        }
+
+        // set board
+        DrawBoardManager manager = new DrawBoardManager();
+        DrawBoard drawArea = new DrawBoard(manager);
+
+        drawArea.setBorder(new TitledBorder(null, "Drawing Area",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+        manager.setDrawBoard(drawArea);
+        manager.setHistory(new Vector<>());
+        drawArea.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+        frame.getContentPane().add(drawArea, BorderLayout.CENTER);
 
         // don't pop this window until needed
         frame.setVisible(false);
