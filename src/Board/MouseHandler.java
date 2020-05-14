@@ -57,7 +57,13 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
                     needDraw = new Text(ending, text);
                 }
             }
-            default -> logError("Unknown Tool: " + toolSelected);
+            default -> {
+                if(!toolSelected.equals("None")) {
+                    logError("Unknown Tool: " + toolSelected);
+                } else {
+                    log("None selected");
+                }
+            }
         }
 
         boardView.getDrawArea().clearBuffer();
