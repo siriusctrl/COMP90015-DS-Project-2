@@ -121,7 +121,9 @@ public class Participant {
     }
 
     public void eventNotification(String text) {
-        JOptionPane.showMessageDialog(boardView.getFrame(), text);
+        if (boardView != null) {
+            JOptionPane.showMessageDialog(boardView.getFrame(), text);
+        }
     }
 
     public ParticipantsManager getParticipantsManager() {

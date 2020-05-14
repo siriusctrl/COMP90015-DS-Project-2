@@ -2,13 +2,17 @@ package Board;
 
 import Tools.Drawable;
 import Users.ParticipantsManager;
+import static Utils.Logger.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Vector;
 
 public class BoardView {
@@ -136,12 +140,30 @@ public class BoardView {
 
         newItem.addActionListener(e -> {
             drawBoardManager.clearHistory();
+            savePath = null;
+            // todo: notify other participants
         });
 
         openItem.addActionListener(e -> {
+            // todo : read from file and notify other participants
             System.out.println("Open");
         });
 
+        closeItem.addActionListener(e -> {
+            System.exit(0);
+        });
+
+        saveItem.addActionListener(e -> {
+            if(savePath != null) {
+                saveTo(savePath);
+            } else {
+                saveAs();
+            }
+        });
+
+        saveAsItem.addActionListener(e -> {
+            saveAs();
+        });
 
         fileMenu.add(newItem);
         fileMenu.add(openItem);
@@ -150,6 +172,51 @@ public class BoardView {
         fileMenu.add(closeItem);
 
         frame.setJMenuBar(menuBar);
+    }
+
+    public void saveTo(String path) {
+        Vector<Drawable> history = getDrawBoardManager().getHistory();
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path));
+            out.writeObject(history);
+            out.close();
+            System.out.println(path);
+        } catch (IOException ioe) {
+            logError(ioe);
+        }
+    }
+
+    public void saveAs() {
+        JFileChooser chooser = new JFileChooser(".");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter(
+                "Board files", "dbd"));
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter(
+                "JPG files", "jpg"));
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter(
+                "PNG files", "png"
+        ));
+
+        int value = chooser.showSaveDialog(this.frame);
+
+        if (value == JFileChooser.APPROVE_OPTION) {
+            String format = ((FileNameExtensionFilter) chooser.getFileFilter()).getExtensions()[0];
+            String savePath = chooser.getSelectedFile().getPath();
+            if (format.equals("dbd")) {
+                Vector<Drawable> history = getDrawBoardManager().getHistory();
+
+                try {
+                    ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(savePath));
+                    out.writeObject(history);
+                    out.close();
+                    this.savePath = savePath;
+                    System.out.println(savePath);
+                } catch (IOException ioe) {
+                    logError(ioe);
+                }
+            }
+            // todo : add support for other file type
+        }
     }
 
     /**
