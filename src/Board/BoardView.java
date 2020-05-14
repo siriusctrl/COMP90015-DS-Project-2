@@ -113,18 +113,35 @@ public class BoardView {
     }
 
     public void addMenu() {
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("A Menu");
-        menu.setMnemonic('A');
-        menu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
-        menuBar.add(menu);
+        if (!participantsManager.isHost()) {
+            return;
+        }
 
-        JMenuItem menuItem = new JMenuItem("Pen", 'A');
-        menuItem.addActionListener(e -> {
-            System.out.println("cao");
+        JMenuBar menuBar = new JMenuBar();
+
+        // file menu
+        JMenu fileMenu = new JMenu("File");
+        menuBar.add(fileMenu);
+        fileMenu.setMnemonic('F');
+        fileMenu.getAccessibleContext().setAccessibleDescription(
+                "The only menu in this program that has menu items");
+
+        JMenuItem newItem = new JMenuItem("new", 'F');
+        JMenuItem openItem = new JMenuItem("open", 'F');
+        JMenuItem saveItem = new JMenuItem("save", 'F');
+        JMenuItem saveAsItem = new JMenuItem("save As", 'F');
+        JMenuItem closeItem = new JMenuItem("close", 'F');
+
+        openItem.addActionListener(e -> {
+            System.out.println("Open");
         });
-        menu.add(menuItem);
+
+
+        fileMenu.add(newItem);
+        fileMenu.add(openItem);
+        fileMenu.add(saveItem);
+        fileMenu.add(saveAsItem);
+        fileMenu.add(closeItem);
 
         frame.setJMenuBar(menuBar);
     }
