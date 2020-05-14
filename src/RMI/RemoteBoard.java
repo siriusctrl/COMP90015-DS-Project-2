@@ -3,6 +3,7 @@ package RMI;
 import Users.Participant;
 import Tools.Drawable;
 
+import javax.swing.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;
@@ -17,8 +18,8 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     }
 
     @Override
-    public void allowJoin(String hostId) {
-        participant.invokeBoard(hostId);
+    public void allowJoin(String hostId, Vector<Drawable> history) {
+        participant.invokeBoard(hostId, history);
     }
 
     @Override
@@ -30,27 +31,28 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
 
 
     @Override
-    public void updateBoard(Vector<Drawable> paints) {
-        // todo : finish this when board is set
-        for (Drawable d: paints) {
-            System.out.println("History said: " + d.msg);
-        }
+    public void updateBoard(Vector<Drawable> history) {
+        System.out.println(history.size());
+
+        participant.getBoardView().setHistory(history);
     }
 
     @Override
     public void kickOut() {
         log("You are kicked by the host");
-        Thread temp = new Thread(participant::exit);
+        Thread temp = new Thread(() -> {
+            participant.eventNotification("You are kicked by the host!");
+            participant.exit();
+        });
         temp.start();
     }
 
     @Override
     public void HostQuit() {
-        // todo: better use visual effect
         log("Host closed its board!");
         participant.hostQ = true;
         Thread temp = new Thread(() -> {
-            participant.quitCheck();
+            participant.eventNotification("Server Quit!");
             participant.exit();
         });
         temp.start();

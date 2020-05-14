@@ -12,6 +12,7 @@ public class DrawBoardManager {
 
     public DrawBoardManager(ParticipantsManager participantsManager) {
         this.participantsManager = participantsManager;
+        history = new Vector<>();
     }
 
     // FIXME : this is only for testing in boardview initBoard

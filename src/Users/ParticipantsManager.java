@@ -1,5 +1,6 @@
 package Users;
 
+import Board.BoardView;
 import Board.ParticipantListPanel;
 import Feedback.*;
 import RMI.IRemoteBoard;
@@ -25,10 +26,9 @@ public class ParticipantsManager {
     private UserType mode;
     private String currentUid;
     private String hostId;
-
     private IRemoteRequest hostReq;
-
     private ParticipantListPanel participantListPanel;
+    private BoardView boardView;
 
     public ParticipantsManager(UserType mode, String uid) {
         allParticipants = new HashMap<>();
@@ -82,7 +82,7 @@ public class ParticipantsManager {
 
         try {
             IRemoteBoard clientBoard = waitingList.get(userId);
-            clientBoard.allowJoin(currentUid);
+            clientBoard.allowJoin(currentUid, boardView.getDrawBoardManager().getHistory());
             allParticipants.put(userId, clientBoard);
         } catch (RemoteException e) {
             logError("Unable to join remote user: " + userId + ", the user might quit already.");
@@ -133,6 +133,11 @@ public class ParticipantsManager {
         updateAllParticipantList();
     }
 
+    /**
+     * This will be called when the host quit, meanwhile, other participant will be quit one by one.
+     * @param uid
+     * @param clientBoard
+     */
     public void quit(String uid, IRemoteBoard clientBoard) {
         if (mode != UserType.HOST) {
             return;
@@ -299,4 +304,7 @@ public class ParticipantsManager {
         return new HashSet<>();
     }
 
+    public void setBoardView(BoardView boardView) {
+        this.boardView = boardView;
+    }
 }

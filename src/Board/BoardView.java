@@ -28,6 +28,7 @@ public class BoardView {
 
     public BoardView(ParticipantsManager participantsManager) {
         this.participantsManager = participantsManager;
+        participantsManager.setBoardView(this);
         init();
     }
 
@@ -244,5 +245,13 @@ public class BoardView {
 
     public DrawBoard getDrawArea() {
         return drawArea;
+    }
+
+    public void setHistory(Vector<Drawable> history) {
+        drawBoardManager.setHistory(history);
+    }
+
+    public DrawBoardManager getDrawBoardManager() {
+        return drawBoardManager;
     }
 }

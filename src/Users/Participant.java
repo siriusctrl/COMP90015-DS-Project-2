@@ -5,6 +5,7 @@ import Board.DrawBoard;
 import Board.DrawBoardManager;
 import Feedback.*;
 import RMI.*;
+import Tools.Drawable;
 import Utils.UserType;
 import com.beust.jcommander.Parameter;
 
@@ -16,6 +17,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Vector;
 
 public class Participant {
 
@@ -81,13 +83,14 @@ public class Participant {
         }
     }
 
-    public void invokeBoard(String hostId) {
+    public void invokeBoard(String hostId, Vector<Drawable> history) {
         System.out.println("Invoke your board view");
         participantsManager.setHostId(hostId);
         participantsManager.setHostReq(remoteRequest);
 
         Thread board = new Thread(() -> {
             boardView = new BoardView(participantsManager);
+            boardView.setHistory(history);
             boardView.getFrame().setVisible(true);
         });
 
@@ -118,12 +121,16 @@ public class Participant {
         }
     }
 
-    public void quitCheck() {
-        JOptionPane.showMessageDialog(boardView.getFrame(), "Server quit!");
+    public void eventNotification(String text) {
+        JOptionPane.showMessageDialog(boardView.getFrame(), text);
     }
 
     public ParticipantsManager getParticipantsManager() {
         return participantsManager;
+    }
+
+    public BoardView getBoardView() {
+        return boardView;
     }
 
     public boolean isHelp() {
