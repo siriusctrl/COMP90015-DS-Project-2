@@ -22,6 +22,8 @@ public class BoardView {
     private DrawBoardManager drawBoardManager;
     private MouseHandler mouseHandler;
 
+    private String savePath;
+
     public BoardView() {
         initBoard();
     }
@@ -106,7 +108,7 @@ public class BoardView {
         drawArea.addMouseMotionListener(mouseHandler);
 
         drawBoardManager.setDrawBoard(drawArea);
-        // todo : remove this as the host will set your board
+
         drawBoardManager.setHistory(new Vector<>());
         drawArea.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
         frame.getContentPane().add(drawArea, BorderLayout.CENTER);
@@ -126,11 +128,15 @@ public class BoardView {
         fileMenu.getAccessibleContext().setAccessibleDescription(
                 "The only menu in this program that has menu items");
 
-        JMenuItem newItem = new JMenuItem("new", 'F');
-        JMenuItem openItem = new JMenuItem("open", 'F');
-        JMenuItem saveItem = new JMenuItem("save", 'F');
-        JMenuItem saveAsItem = new JMenuItem("save As", 'F');
-        JMenuItem closeItem = new JMenuItem("close", 'F');
+        JMenuItem newItem = new JMenuItem("New", 'F');
+        JMenuItem openItem = new JMenuItem("Open", 'F');
+        JMenuItem saveItem = new JMenuItem("Save", 'F');
+        JMenuItem saveAsItem = new JMenuItem("Save As", 'F');
+        JMenuItem closeItem = new JMenuItem("Close", 'F');
+
+        newItem.addActionListener(e -> {
+            drawBoardManager.clearHistory();
+        });
 
         openItem.addActionListener(e -> {
             System.out.println("Open");

@@ -50,6 +50,12 @@ public class DrawBoardManager {
         repaint();
     }
 
+    public void clearHistory() {
+        this.history = new Vector<>();
+        repaint();
+        participantsManager.repaintAll();
+    }
+
     public void repaint() {
         drawBoard.repaint();
     }
