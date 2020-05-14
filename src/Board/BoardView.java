@@ -15,7 +15,7 @@ public class BoardView {
     private JFrame frame;
 
     public static final String TITLE = "Distributed Board";
-    public static final String[] TOOLS = {"Pen", "Line", "Circle", "Rectangle", "Text", "Eraser", "None"};
+    public static final String[] TOOLS = {"Pen", "Line", "Circle", "Rectangle", "Text", "None"};
 
     private ParticipantsManager participantsManager;
     private DrawBoard drawArea;
@@ -73,20 +73,18 @@ public class BoardView {
         drawToolPanel.add(toolPanel, BorderLayout.NORTH);
 
         JTextPane toolnow = new JTextPane();
-        toolnow.setText("Pen");
+        toolnow.setText("None");
         toolnow.setOpaque(false);
         toolnow.setEditable(false);
         JPanel displayTool = new JPanel();
         displayTool.add(toolnow);
         drawToolPanel.add(displayTool, BorderLayout.CENTER);
 
-        JButton bt = null;
         for(String tool:TOOLS) {
-            bt = new JButton(tool);
+            JButton bt = new JButton(tool);
             bt.setCursor(new Cursor(Cursor.HAND_CURSOR));
             toolPanel.add(bt);
             bt.addActionListener((e) -> {
-                // todo : set real selected tool here
                 toolnow.setText(e.getActionCommand());
                 mouseHandler.setToolSelected(e.getActionCommand());
             });

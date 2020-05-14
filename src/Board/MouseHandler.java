@@ -17,7 +17,6 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
     private BoardView boardView;
 
     private String toolSelected;
-    private Image imgBuffer;
     private Pen penBuffer;
 
     public MouseHandler(BoardView boardView) {
@@ -27,15 +26,10 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (!e.getActionCommand().equals("")){
-            toolSelected = ((JButton) e.getSource()).getActionCommand();
-        }
     }
 
     public void mousePressed(MouseEvent e) {
         starting = new Point(e.getX(), e.getY());
-        imgBuffer = boardView.getDrawArea().createImage(boardView.getDrawArea().getWidth(),
-                boardView.getDrawArea().getHeight());
 
         if (toolSelected.equals("Pen")) {
             penBuffer = new Pen();

@@ -11,7 +11,7 @@ public abstract class Drawable implements Serializable {
     protected Point end;
 
     protected final Color COLOR = Color.black;
-    protected final int STROKE = 3;
+    protected final int STROKE = 2;
 
     public Drawable(Point start, Point end) {
         this.start = start;
