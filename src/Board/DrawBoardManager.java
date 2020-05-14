@@ -24,7 +24,11 @@ public class DrawBoardManager {
     }
 
     public Vector<Drawable> getHistory() {
-        return history;
+        if (participantsManager.isHost()) {
+            return history;
+        }
+
+        return participantsManager.getHistory();
     }
 
     /**
@@ -34,13 +38,19 @@ public class DrawBoardManager {
      */
     public void setHistory(Vector<Drawable> history) {
         this.history = history;
-        drawBoard.repaint();
+        repaint();
     }
 
     public void addDrawable(Drawable drawable) {
-        history.add(drawable);
-        // todo : let the participant handler handle different mode action
-        //participantsManager.addHistory()
+        if (participantsManager.isHost()) {
+            history.add(drawable);
+        }
+        participantsManager.addHistory(drawable);
+
+        repaint();
+    }
+
+    public void repaint() {
         drawBoard.repaint();
     }
 

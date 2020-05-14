@@ -1,12 +1,13 @@
 package RMI;
 
 import Feedback.Feedback;
+import Tools.Drawable;
 import Users.ParticipantsManager;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Vector;
 
 public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest {
 
@@ -32,5 +33,17 @@ public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest
     @Override
     public void removeUserRequest(String uid) {
         participantsManager.removeUser(uid);
+    }
+
+    @Override
+    public Vector<Drawable> getHistoryRequest() {
+        return participantsManager.getHistory();
+    }
+
+    @Override
+    public void addDrawableRequest(Drawable drawable) {
+        participantsManager.getBoardView().addDrawable(drawable);
+        //todo : finish the following command for repainting when host update its board
+        //participantsManager.repaintAll();
     }
 }

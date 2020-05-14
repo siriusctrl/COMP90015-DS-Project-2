@@ -83,14 +83,13 @@ public class Participant {
         }
     }
 
-    public void invokeBoard(String hostId, Vector<Drawable> history) {
+    public void invokeBoard(String hostId) {
         System.out.println("Invoke your board view");
         participantsManager.setHostId(hostId);
         participantsManager.setHostReq(remoteRequest);
 
         Thread board = new Thread(() -> {
             boardView = new BoardView(participantsManager);
-            boardView.setHistory(history);
             boardView.getFrame().setVisible(true);
         });
 

@@ -18,8 +18,8 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     }
 
     @Override
-    public void allowJoin(String hostId, Vector<Drawable> history) {
-        participant.invokeBoard(hostId, history);
+    public void allowJoin(String hostId) {
+        participant.invokeBoard(hostId);
     }
 
     @Override
@@ -61,5 +61,10 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     @Override
     public void refreshParticipantList() {
         participant.getParticipantsManager().updateList();
+    }
+
+    @Override
+    public void repaint() {
+        participant.getBoardView().getDrawArea().repaint();
     }
 }

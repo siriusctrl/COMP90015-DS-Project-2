@@ -6,6 +6,7 @@ import Feedback.*;
 import RMI.IRemoteBoard;
 import RMI.IRemoteRequest;
 import Tools.*;
+import Utils.Logger;
 import Utils.UserType;
 
 import static Utils.Logger.*;
@@ -82,7 +83,7 @@ public class ParticipantsManager {
 
         try {
             IRemoteBoard clientBoard = waitingList.get(userId);
-            clientBoard.allowJoin(currentUid, boardView.getDrawBoardManager().getHistory());
+            clientBoard.allowJoin(currentUid);
             allParticipants.put(userId, clientBoard);
         } catch (RemoteException e) {
             logError("Unable to join remote user: " + userId + ", the user might quit already.");
@@ -232,6 +233,36 @@ public class ParticipantsManager {
     }
 
 
+    public void addHistory(Drawable drawable) {
+        if (isHost()) {
+            repaintAll();
+        } else {
+            try {
+                hostReq.addDrawableRequest(drawable);
+            } catch (RemoteException e) {
+                logError("Unable to send drawable to host");
+            }
+        }
+    }
+
+
+    public void repaintAll () {
+        if(mode != UserType.HOST) {
+            return;
+        }
+
+        for(String uid:getAllParticipantsID()) {
+            IRemoteBoard rboard = allParticipants.get(uid);
+
+            try{
+                rboard.repaint();
+            } catch (RemoteException e) {
+                logError("Cannot repaint user: " + uid);
+            }
+        }
+    }
+
+
     public UserType getUserType(String uid) {
         if (uid.equals(hostId)) {
             return UserType.HOST;
@@ -306,5 +337,23 @@ public class ParticipantsManager {
 
     public void setBoardView(BoardView boardView) {
         this.boardView = boardView;
+    }
+
+    public Vector<Drawable> getHistory() {
+        if (isHost()) {
+            return boardView.getDrawBoardManager().getHistory();
+        } else {
+            try {
+                return hostReq.getHistoryRequest();
+            } catch (RemoteException e) {
+                logError("cannot get host board");
+            }
+        }
+
+        return null;
+    }
+
+    public BoardView getBoardView() {
+        return boardView;
     }
 }
