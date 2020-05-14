@@ -3,7 +3,6 @@ package RMI;
 import Users.Participant;
 import Tools.Drawable;
 
-import javax.swing.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Vector;

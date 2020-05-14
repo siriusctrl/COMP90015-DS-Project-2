@@ -17,8 +17,8 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
     private BoardView boardView;
 
     private String toolSelected;
-
     private Image imgBuffer;
+    private Pen penBuffer;
 
     public MouseHandler(BoardView boardView) {
         this.boardView = boardView;
@@ -36,6 +36,11 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
         starting = new Point(e.getX(), e.getY());
         imgBuffer = boardView.getDrawArea().createImage(boardView.getDrawArea().getWidth(),
                 boardView.getDrawArea().getHeight());
+
+        if (toolSelected.equals("Pen")) {
+            penBuffer = new Pen();
+            penBuffer.addTrace(starting);
+        }
     }
 
     @Override
@@ -48,6 +53,10 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
             case ("Line") -> needDraw = new Line(starting, ending);
             case ("Circle") -> needDraw = new Circle(starting, ending);
             case ("Rectangle") -> needDraw = new Rectangle(starting, ending);
+            case ("Pen") -> {
+                penBuffer.addTrace(ending);
+                needDraw = penBuffer;
+            }
             case ("Text") -> {
                 String text = JOptionPane.showInputDialog(boardView.getFrame(), "Text: ");
                 if (text != null && text != "") {
@@ -60,6 +69,7 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
         boardView.getDrawArea().clearBuffer();
         if (needDraw != null) {
             boardView.addDrawable(needDraw);
+            penBuffer = null;
         }
     }
 
@@ -73,6 +83,10 @@ public class MouseHandler extends MouseAdapter implements ActionListener {
             case ("Line") -> preview = new Line(starting, ending);
             case ("Circle") -> preview = new Circle(starting, ending);
             case ("Rectangle") -> preview = new Rectangle(starting, ending);
+            case ("Pen") -> {
+                penBuffer.addTrace(ending);
+                preview = penBuffer;
+            }
         }
 
         boardView.getDrawArea().setBuffer(preview);
