@@ -14,4 +14,5 @@ public interface IRemoteBoard extends Remote {
     void HostQuit() throws RemoteException;
     void refreshParticipantList() throws RemoteException;
     void repaint() throws RemoteException;
+    void notification(String text) throws RemoteException;
 }

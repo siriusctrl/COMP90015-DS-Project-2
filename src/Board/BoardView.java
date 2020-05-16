@@ -119,9 +119,6 @@ public class BoardView {
     }
 
     public void addMenu() {
-        if (!participantsManager.isHost()) {
-            return;
-        }
 
         JMenuBar menuBar = new JMenuBar();
 
@@ -139,9 +136,13 @@ public class BoardView {
         JMenuItem closeItem = new JMenuItem("Close", 'F');
 
         newItem.addActionListener(e -> {
-            drawBoardManager.clearHistory();
-            savePath = null;
-            // todo: notify other participants
+            if (participantsManager.isHost()) {
+                drawBoardManager.clearHistory();
+                savePath = null;
+                participantsManager.notifyOthers("Host open a new board");
+            } else {
+                JOptionPane.showMessageDialog(this.frame, "You are not the host");
+            }
         });
 
         openItem.addActionListener(e -> {

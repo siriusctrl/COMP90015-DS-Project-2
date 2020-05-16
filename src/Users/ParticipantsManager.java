@@ -263,6 +263,24 @@ public class ParticipantsManager {
     }
 
 
+    public void notifyOthers(String text) {
+        if (!isHost()) {
+            return;
+        }
+
+        for (String uid:getAllParticipantsID()) {
+            if (uid != currentUid) {
+                IRemoteBoard board = allParticipants.get(uid);
+                try {
+                    board.notification(text);
+                } catch (RemoteException e) {
+                    logError("Cannot send notification to user: " + uid);
+                }
+            }
+        }
+    }
+
+
     public UserType getUserType(String uid) {
         if (uid.equals(hostId)) {
             return UserType.HOST;

@@ -58,6 +58,12 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
     }
 
     @Override
+    public void notification(String text) {
+        Thread temp = new Thread(() -> participant.eventNotification(text));
+        temp.start();
+    }
+
+    @Override
     public void refreshParticipantList() {
         participant.getParticipantsManager().updateList();
     }
