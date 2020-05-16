@@ -39,6 +39,9 @@ public class DrawBoardManager {
     public void setHistory(Vector<Drawable> history) {
         this.history = history;
         repaint();
+        if (participantsManager.isHost()) {
+            participantsManager.repaintAll();
+        }
     }
 
     public void addDrawable(Drawable drawable) {

@@ -217,22 +217,6 @@ public class ParticipantsManager {
         }
     }
 
-    /**
-     * update a specific user's board the changes to all the allParticipants
-     * @param userId
-     * @throws RemoteException
-     */
-    public void updateBoard(String userId) throws RemoteException {
-        IRemoteBoard clientBoard = allParticipants.get(userId);
-
-        // todo : below are only for testing, change it to real board history later
-        Vector<Drawable> newBoard = new Vector<>();
-        newBoard.add(new Line(new Point(0, 0), new Point(0,1)));
-
-        clientBoard.updateBoard(newBoard);
-    }
-
-
     public void addHistory(Drawable drawable) {
         if (isHost()) {
             repaintAll();

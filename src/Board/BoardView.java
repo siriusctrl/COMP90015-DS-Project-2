@@ -10,9 +10,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.Vector;
 
 public class BoardView {
@@ -27,10 +25,6 @@ public class BoardView {
     private MouseHandler mouseHandler;
 
     private String savePath;
-
-    public BoardView() {
-        initBoard();
-    }
 
     public BoardView(ParticipantsManager participantsManager) {
         this.participantsManager = participantsManager;
@@ -139,15 +133,19 @@ public class BoardView {
             if (participantsManager.isHost()) {
                 drawBoardManager.clearHistory();
                 savePath = null;
-                participantsManager.notifyOthers("Host open a new board");
+                participantsManager.notifyOthers("Host open a new board!");
             } else {
-                JOptionPane.showMessageDialog(this.frame, "You are not the host");
+                JOptionPane.showMessageDialog(this.frame, "You are not the host!");
             }
         });
 
         openItem.addActionListener(e -> {
-            // todo : read from file and notify other participants
-            System.out.println("Open");
+            if(participantsManager.isHost()) {
+                openBoard();
+                participantsManager.notifyOthers("Host open a saved board!");
+            } else {
+                JOptionPane.showMessageDialog(this.frame, "You are not the host!");
+            }
         });
 
         closeItem.addActionListener(e -> {
@@ -155,15 +153,23 @@ public class BoardView {
         });
 
         saveItem.addActionListener(e -> {
-            if(savePath != null) {
-                saveTo(savePath);
+            if (participantsManager.isHost()) {
+                if(savePath != null) {
+                    saveTo(savePath);
+                } else {
+                    saveAs();
+                }
             } else {
-                saveAs();
+                JOptionPane.showMessageDialog(this.frame, "You are not the host!");
             }
         });
 
         saveAsItem.addActionListener(e -> {
-            saveAs();
+            if(participantsManager.isHost()) {
+                saveAs();
+            } else {
+                JOptionPane.showMessageDialog(this.frame, "You are not the host!");
+            }
         });
 
         fileMenu.add(newItem);
@@ -173,6 +179,27 @@ public class BoardView {
         fileMenu.add(closeItem);
 
         frame.setJMenuBar(menuBar);
+    }
+
+    public void openBoard() {
+        JFileChooser chooser = new JFileChooser(".");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter(
+                "Board files", "draw"));
+
+        int value = chooser.showOpenDialog(this.frame);
+
+        if (value == JFileChooser.APPROVE_OPTION) {
+            String openPath = chooser.getSelectedFile().getPath();
+            try {
+                ObjectInputStream input = new ObjectInputStream(new FileInputStream(openPath));
+                setHistory((Vector<Drawable>) input.readObject());
+                savePath = openPath;
+            } catch (IOException | ClassNotFoundException e) {
+                logError("Cannot open target file due to: " + e.getMessage());
+            }
+
+        }
     }
 
     public void saveTo(String path) {
@@ -191,19 +218,14 @@ public class BoardView {
         JFileChooser chooser = new JFileChooser(".");
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.addChoosableFileFilter(new FileNameExtensionFilter(
-                "Board files", "dbd"));
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter(
-                "JPG files", "jpg"));
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter(
-                "PNG files", "png"
-        ));
+                "Board files", "draw"));
 
         int value = chooser.showSaveDialog(this.frame);
 
         if (value == JFileChooser.APPROVE_OPTION) {
             String format = ((FileNameExtensionFilter) chooser.getFileFilter()).getExtensions()[0];
             String savePath = chooser.getSelectedFile().getPath();
-            if (format.equals("dbd")) {
+            if (format.equals("draw")) {
                 Vector<Drawable> history = getDrawBoardManager().getHistory();
 
                 try {
@@ -218,114 +240,6 @@ public class BoardView {
             }
             // todo : add support for other file type
         }
-    }
-
-    /**
-     * deprecated and only for testing
-     */
-    private void initBoard() {
-        frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // When close the window, it should remove its information in the system.
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-            }
-        });
-
-        frame.setSize(1000, 700);
-        frame.setTitle(TITLE);
-        frame.setResizable(true);
-
-        JList<String> tempList = new JList<>();
-        Vector<String> testData = new Vector<>();
-        testData.add("[guest] cao");
-        testData.add("[visitor] Dajiba");
-        tempList.setListData(testData);
-        tempList.addListSelectionListener((e) -> {
-            if(!tempList.getValueIsAdjusting()) {
-                String selected = tempList.getSelectedValue();
-
-                if (selected != null) {
-                    String[] temp = selected.split("]");
-
-                    if (temp[1] != null) {
-                        int result = JOptionPane.showConfirmDialog(frame, "Allow |" + temp[1].strip() + "| in?",
-                                "Guest Management", JOptionPane.YES_NO_CANCEL_OPTION);
-
-                        switch (result) {
-                            case (0) -> {
-                                System.out.println("yes");
-                                testData.remove(1);
-                                testData.add("[guest] Dajiba");
-                                tempList.setListData(testData);
-                            }
-                            case (1) -> System.out.println("no");
-                            case (2) -> System.out.println("cancel");
-                        }
-                    }
-                }
-            }
-        });
-
-        JPanel sub = new JPanel(new BorderLayout(0, 0));
-        sub.setPreferredSize(new Dimension(200,200));
-        sub.add(tempList);
-        sub.setBorder(new TitledBorder(null, "Participants",
-                TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        frame.getContentPane().add(sub, BorderLayout.EAST);
-
-        addMenu();
-
-        // ANCHOR: set drawing tools
-
-        JPanel drawToolPanel = new JPanel();
-
-        drawToolPanel.setPreferredSize(new Dimension(110, 0));
-        frame.getContentPane().add(drawToolPanel, BorderLayout.WEST);
-        drawToolPanel.setLayout(new BorderLayout(0 ,0));
-        JPanel toolPanel = new JPanel();
-
-        toolPanel.setBorder(new TitledBorder(null, "Tool Bar",
-                TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        toolPanel.setLayout(new GridLayout(0, 1, 0, 0));
-        toolPanel.setPreferredSize(new Dimension(0, 300));
-        drawToolPanel.add(toolPanel, BorderLayout.NORTH);
-
-        JTextPane toolnow = new JTextPane();
-        toolnow.setText("Pen");
-        JPanel displayTool = new JPanel();
-        displayTool.add(toolnow);
-        drawToolPanel.add(displayTool, BorderLayout.CENTER);
-
-        JButton bt = null;
-        for(String tool:TOOLS) {
-            bt = new JButton(tool);
-            bt.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            toolPanel.add(bt);
-            bt.addActionListener((e) -> {
-                // set the selected tool here
-                toolnow.setText(e.getActionCommand());
-            });
-        }
-
-        // set board
-        DrawBoardManager manager = new DrawBoardManager();
-        DrawBoard drawArea = new DrawBoard(manager);
-
-        drawArea.setBorder(new TitledBorder(null, "Drawing Area",
-                TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        manager.setDrawBoard(drawArea);
-        manager.setHistory(new Vector<>());
-        drawArea.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-        frame.getContentPane().add(drawArea, BorderLayout.CENTER);
-
-        // don't pop this window until needed
-        frame.setVisible(false);
     }
 
     public JFrame getFrame() {
