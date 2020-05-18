@@ -28,14 +28,6 @@ public class RemoteBoard extends UnicastRemoteObject implements IRemoteBoard {
         temp.start();
     }
 
-
-    @Override
-    public void updateBoard(Vector<Drawable> history) {
-        System.out.println(history.size());
-
-        participant.getBoardView().setHistory(history);
-    }
-
     @Override
     public void kickOut() {
         log("You are kicked by the host");
