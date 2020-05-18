@@ -72,12 +72,12 @@ public class BoardView {
         toolPanel.setPreferredSize(new Dimension(0, 300));
         drawToolPanel.add(toolPanel, BorderLayout.NORTH);
 
-        JTextPane toolnow = new JTextPane();
-        toolnow.setText("None");
-        toolnow.setOpaque(false);
-        toolnow.setEditable(false);
+        JTextPane toolNow = new JTextPane();
+        toolNow.setText("None");
+        toolNow.setOpaque(false);
+        toolNow.setEditable(false);
         JPanel displayTool = new JPanel();
-        displayTool.add(toolnow);
+        displayTool.add(toolNow);
         drawToolPanel.add(displayTool, BorderLayout.CENTER);
 
         for(String tool:TOOLS) {
@@ -85,7 +85,7 @@ public class BoardView {
             bt.setCursor(new Cursor(Cursor.HAND_CURSOR));
             toolPanel.add(bt);
             bt.addActionListener((e) -> {
-                toolnow.setText(e.getActionCommand());
+                toolNow.setText(e.getActionCommand());
                 mouseHandler.setToolSelected(e.getActionCommand());
             });
         }
