@@ -236,7 +236,6 @@ public class BoardView {
                     logError(ioe);
                 }
             }
-            // todo : add support for other file type
         }
     }
 
