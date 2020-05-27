@@ -1,11 +1,9 @@
 package Users;
 
 import Board.BoardView;
-import Board.DrawBoard;
-import Board.DrawBoardManager;
-import Feedback.*;
 import RMI.*;
-import Tools.Drawable;
+import Utils.Feedback;
+import Utils.FeedbackState;
 import Utils.UserType;
 import com.beust.jcommander.Parameter;
 
@@ -17,7 +15,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Vector;
 
 public class Participant {
 
@@ -65,8 +62,7 @@ public class Participant {
 
         try {
             remoteRequest = (IRemoteRequest) serverRegistry.lookup("request");
-            Feedback feedback = remoteRequest.joinRequest(userId, serverIp, selfPort);
-            return feedback;
+            return remoteRequest.joinRequest(userId, serverIp, selfPort);
         } catch (RemoteException | NotBoundException e) {
             return new Feedback(FeedbackState.ERROR, "Joining Error: " + e.getMessage());
         }

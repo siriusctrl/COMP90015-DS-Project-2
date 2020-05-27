@@ -4,7 +4,6 @@ import Board.BoardView;
 import Board.DrawBoard;
 import Board.DrawBoardManager;
 import RMI.CreateRegistry;
-import RMI.RemoteHello;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -42,7 +41,6 @@ public class Host {
 
         try {
             // bind functions
-            serverRegistry.bind("hello", new RemoteHello());
             serverRegistry.bind("request", new RemoteRequest(participantsManager));
         } catch (RemoteException | AlreadyBoundException e) {
             System.err.println("bind function error at Host: " + e.getMessage());

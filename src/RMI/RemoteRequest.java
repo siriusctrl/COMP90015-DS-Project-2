@@ -1,6 +1,6 @@
 package RMI;
 
-import Feedback.Feedback;
+import Utils.Feedback;
 import Tools.Drawable;
 import Users.ParticipantsManager;
 
@@ -20,7 +20,7 @@ public class RemoteRequest extends UnicastRemoteObject implements IRemoteRequest
     @Override
     public Feedback joinRequest(String userId, String host, int port) {
         System.out.println("==== get a user ====");
-        System.out.println("userid = " + userId + ", host = " + host + ", port = " + port);
+        System.out.println("userId = " + userId + ", host = " + host + ", port = " + port);
         // participantsManager add clients
         return participantsManager.addUserToWaitingList(userId, host, port);
     }

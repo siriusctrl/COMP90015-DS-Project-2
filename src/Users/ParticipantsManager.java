@@ -2,16 +2,15 @@ package Users;
 
 import Board.BoardView;
 import Board.ParticipantListPanel;
-import Feedback.*;
 import RMI.IRemoteBoard;
 import RMI.IRemoteRequest;
 import Tools.*;
-import Utils.Logger;
+import Utils.Feedback;
+import Utils.FeedbackState;
 import Utils.UserType;
 
 import static Utils.Logger.*;
 
-import java.awt.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

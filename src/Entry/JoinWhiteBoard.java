@@ -1,7 +1,7 @@
 package Entry;
 
 import Users.Participant;
-import Feedback.Feedback;
+import Utils.Feedback;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
