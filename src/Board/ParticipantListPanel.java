@@ -5,6 +5,7 @@ import Users.ParticipantsManager;
 import static Utils.Logger.*;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.Vector;
 
@@ -124,7 +125,8 @@ public class ParticipantListPanel extends JPanel {
         scrollPane.setViewportView(participants);
         subPanel.add(scrollPane);
         add(subPanel, BorderLayout.CENTER);
-
+        subPanel.setBorder(new TitledBorder(null, "Participant List",
+                TitledBorder.LEADING, TitledBorder.TOP, null, null));
     }
 
 }
